@@ -9,9 +9,10 @@ namespace DRMDesktopUI.ViewModels
     {
 		private string _userName;
 		private string _password;
+		private bool _isErrorVisible;
 		private readonly IApiHelper _api;
 
-		public LoginViewModel(IApiHelper api)
+        public LoginViewModel(IApiHelper api)
 		{
 			_api = api;
 		}
@@ -53,15 +54,43 @@ namespace DRMDesktopUI.ViewModels
             }
 		}
 
+		public bool IsErrorVisible
+		{
+			get 
+			{
+				if (string.IsNullOrWhiteSpace(ErrorMessage))
+				{
+					return false;
+				}
+
+				return true; 
+			}
+		}
+
+		private string _errorMessage;
+
+		public string ErrorMessage
+		{
+			get { return _errorMessage; }
+			set 
+			{
+				_errorMessage = value;
+				NotifyOfPropertyChange(() => IsErrorVisible);
+				NotifyOfPropertyChange(() => ErrorMessage);
+            }
+		}
+
+
 		public async Task LogIn()
 		{
 			try
 			{
 				var result = await _api.Authenticate(UserName, Password);
-			}
-			catch (Exception ex)
+                ErrorMessage = string.Empty;
+            }
+            catch (Exception ex)
 			{
-				Console.WriteLine(ex.Message);
+				ErrorMessage = ex.Message;
 			}
 		}
 	}
