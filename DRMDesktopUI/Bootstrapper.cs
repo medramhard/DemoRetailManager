@@ -1,6 +1,8 @@
 ﻿using Caliburn.Micro;
 using DRMDesktopUI.Helper;
 using DRMDesktopUI.ViewModels;
+using DRMDesktopUILibrary.Api;
+using DRMDesktopUILibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +34,8 @@ namespace DRMDesktopUI
             _container
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
-                .Singleton<IApiHelper, ApiHelper>();
+                .Singleton<IApiHelper, ApiHelper>()
+                .Singleton<ILoggedInUserModel, LoggedInUserModel>();
 
             GetType().Assembly.GetTypes()
                 .Where(type => type.IsClass)

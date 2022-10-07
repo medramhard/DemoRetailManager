@@ -1,11 +1,11 @@
 ﻿using Caliburn.Micro;
-using DRMDesktopUI.Helper;
+using DRMDesktopUILibrary.Api;
 using System;
 using System.Threading.Tasks;
 
 namespace DRMDesktopUI.ViewModels
 {
-    public class LoginViewModel : Screen
+	public class LoginViewModel : Screen
     {
 		private string _userName;
 		private string _password;
@@ -85,8 +85,10 @@ namespace DRMDesktopUI.ViewModels
 		{
 			try
 			{
-				var result = await _api.Authenticate(UserName, Password);
                 ErrorMessage = string.Empty;
+				var result = await _api.Authenticate(UserName, Password);
+
+				await _api.GetUser(result.Access_Token);
             }
             catch (Exception ex)
 			{
