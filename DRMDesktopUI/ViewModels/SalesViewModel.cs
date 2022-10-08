@@ -12,7 +12,7 @@ namespace DRMDesktopUI.ViewModels
     {
         private BindingList<string> _items;
         private BindingList<string> _cart;
-        private string _itemQuantity;
+        private int _itemQuantity;
         private string _subTotal;
         private string _tax;
         private string _total;
@@ -37,7 +37,7 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
-        public string ItemQuantity
+        public int ItemQuantity
         {
             get { return _itemQuantity; }
             set

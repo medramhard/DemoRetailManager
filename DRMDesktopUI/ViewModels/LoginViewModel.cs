@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using DRMDesktopUI.EventModels;
 using DRMDesktopUILibrary.Api;
 using System;
 using System.Threading.Tasks;
@@ -11,10 +12,12 @@ namespace DRMDesktopUI.ViewModels
 		private string _password;
 		private bool _isErrorVisible;
 		private readonly IApiHelper _api;
+		private readonly IEventAggregator _events;
 
-        public LoginViewModel(IApiHelper api)
+		public LoginViewModel(IApiHelper api, IEventAggregator events)
 		{
 			_api = api;
+			_events = events;
 		}
 
 		public string UserName
@@ -89,6 +92,7 @@ namespace DRMDesktopUI.ViewModels
 				var result = await _api.Authenticate(UserName, Password);
 
 				await _api.GetUser(result.Access_Token);
+				await _events.PublishOnUIThreadAsync(new LogOnEvent());
             }
             catch (Exception ex)
 			{

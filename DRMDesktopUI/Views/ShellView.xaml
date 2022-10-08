@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DRMDesktopUI.Views"
         mc:Ignorable="d" FontSize="18"
-        Title="Demo Retail Manager" Height="450" Width="800">
+        Title="Demo Retail Manager" Height="800" Width="1200">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="File">
@@ -16,7 +16,7 @@
             </MenuItem>
         </Menu>
         <Grid>
-            <ContentControl x:Name="ActiveItem" Margin="10"/>
+            <ContentControl x:Name="ActiveItem" Margin="20 10 20 20"/>
         </Grid>
     </DockPanel>
 </Window>
