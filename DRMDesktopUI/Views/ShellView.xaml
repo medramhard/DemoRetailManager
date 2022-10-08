@@ -5,7 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DRMDesktopUI.Views"
         mc:Ignorable="d" FontSize="18"
-        FontFamily="Consolas"
         Title="Demo Retail Manager" Height="450" Width="800">
     <DockPanel>
         <Menu DockPanel.Dock="Top">
