@@ -37,7 +37,14 @@
         <!-- Products Column -->
         <TextBlock Grid.Row="2" Grid.Column="1" Text="Items"/>
         <ListBox x:Name="Items" Grid.Row="3" Grid.Column="1"
-                 MinWidth="220" MinHeight="300"/>
+                 MinWidth="220" MinHeight="300">
+            
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <!-- Interactivity Column -->
         <StackPanel Grid.Row="3" Grid.Column="2" Margin="20 0"

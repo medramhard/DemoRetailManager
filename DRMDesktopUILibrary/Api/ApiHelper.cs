@@ -25,6 +25,14 @@ namespace DRMDesktopUILibrary.Api
             _loggedInUser = loggedInUser;
         }
 
+        public HttpClient ApiClient
+        {
+            get
+            {
+                return _apiClient;
+            }
+        }
+
         public async Task<AuthenticatedUserModel> Authenticate(string username, string password)
         {
             var data = new FormUrlEncodedContent(new[]

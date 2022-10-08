@@ -1,4 +1,6 @@
 ﻿using Caliburn.Micro;
+using DRMDesktopUILibrary.Api;
+using DRMDesktopUILibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,14 +12,31 @@ namespace DRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        private BindingList<string> _items;
-        private BindingList<string> _cart;
+        private BindingList<ProductModel> _items;
+        private BindingList<ProductModel> _cart;
         private int _itemQuantity;
         private string _subTotal;
         private string _tax;
         private string _total;
+        private readonly IProductEndpoint _productEndpoint;
 
-        public BindingList<string> Items
+        public SalesViewModel(IProductEndpoint productEndpoint)
+        {
+            _productEndpoint = productEndpoint;
+        }
+
+        protected override async void OnViewLoaded(object view)
+        {
+            base.OnViewLoaded(view);
+            await LoadItems();
+        }
+
+        private async Task LoadItems()
+        {
+            Items = new BindingList<ProductModel>(await _productEndpoint.GetAll());
+        }
+
+        public BindingList<ProductModel> Items
         {
             get { return _items; }
             set
@@ -27,7 +46,7 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
-        public BindingList<string> Cart
+        public BindingList<ProductModel> Cart
         {
             get { return _cart; }
             set
