@@ -13,17 +13,15 @@ namespace DRMDesktopUI.ViewModels
     {
         private readonly SalesViewModel _salesVM;
         private readonly IEventAggregator _events;
-        private readonly SimpleContainer _container;
 
-        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, SimpleContainer container)
+        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events)
         {
             _salesVM = salesVM;
             _events = events;
-            _container = container;
 
             _events.SubscribeOnPublishedThread(this);
 
-            ActivateItemAsync(_container.GetInstance<LoginViewModel>());
+            ActivateItemAsync(IoC.Get<LoginViewModel>());
         }
 
         public Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
