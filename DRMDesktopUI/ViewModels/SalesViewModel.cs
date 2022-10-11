@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using DRMDesktopUILibrary.Api;
+using DRMDesktopUILibrary.Helpers;
 using DRMDesktopUILibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -15,15 +16,14 @@ namespace DRMDesktopUI.ViewModels
         private BindingList<ProductModel> _products;
         private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
         private int _productQuantity = 1;
-        private decimal _subTotal;
-        private decimal _tax;
-        private decimal _total;
         private ProductModel _selectedProduct;
         private readonly IProductEndpoint _productEndpoint;
+        private readonly IConfigHelper _configHelper;
 
-        public SalesViewModel(IProductEndpoint productEndpoint)
+        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
         {
             _productEndpoint = productEndpoint;
+            _configHelper = configHelper;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -35,6 +35,41 @@ namespace DRMDesktopUI.ViewModels
         private async Task LoadProducts()
         {
             Products = new BindingList<ProductModel>(await _productEndpoint.GetAll());
+        }
+
+        private decimal CalculateSubTotal()
+        {
+            decimal output = 0;
+
+            foreach (var item in Cart)
+            {
+                output += (item.Product.RetailPrice * item.QuantityInCart);
+            }
+
+            return output;
+        }
+
+        private decimal CalculateTax()
+        {
+            decimal output = 0;
+            decimal taxRate = _configHelper.GetTaxRate();
+
+            foreach (var item in Cart)
+            {
+                if (item.Product.IsTaxable)
+                {
+                    output += (item.Product.RetailPrice * item.QuantityInCart * taxRate / 100);
+                }
+            }
+
+            return output;
+        }
+
+        private decimal CalculateTotal()
+        {
+            decimal output = CalculateSubTotal() + CalculateTax();
+
+            return output;
         }
 
         public BindingList<ProductModel> Products
@@ -83,23 +118,24 @@ namespace DRMDesktopUI.ViewModels
         {
             get
             {
-                foreach (var item in Cart)
-                {
-                    _subTotal += (item.Product.RetailPrice * item.QuantityInCart);
-                }
-
-                return _subTotal.ToString("C");
+                return CalculateSubTotal().ToString("C");
             }
         }
 
         public string Tax
         {
-            get { return _tax.ToString("C"); }
+            get
+            {
+                return CalculateTax().ToString("C");
+            }
         }
 
         public string Total
         {
-            get { return _total.ToString("C"); }
+            get
+            {
+                return CalculateTotal().ToString("C");
+            }
         }
 
         public bool CanAdd
@@ -157,11 +193,16 @@ namespace DRMDesktopUI.ViewModels
             SelectedProduct.QuantityInStock -= ProductQuantity;
             ProductQuantity = 1;
             NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public void Remove()
         {
-            throw new NotImplementedException();
+
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
         }
 
         public void Buy()

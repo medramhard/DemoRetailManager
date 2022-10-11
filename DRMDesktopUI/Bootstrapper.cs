@@ -2,6 +2,7 @@
 using DRMDesktopUI.Helper;
 using DRMDesktopUI.ViewModels;
 using DRMDesktopUILibrary.Api;
+using DRMDesktopUILibrary.Helpers;
 using DRMDesktopUILibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,7 @@ namespace DRMDesktopUI
                 .Singleton<IWindowManager, WindowManager>()
                 .Singleton<IEventAggregator, EventAggregator>()
                 .Singleton<IApiHelper, ApiHelper>()
+                .Singleton<IConfigHelper, ConfigHelper>()
                 .Singleton<ILoggedInUserModel, LoggedInUserModel>();
 
             GetType().Assembly.GetTypes()
