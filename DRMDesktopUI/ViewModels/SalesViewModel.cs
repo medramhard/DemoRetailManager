@@ -12,12 +12,13 @@ namespace DRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        private BindingList<ProductModel> _items;
-        private BindingList<ProductModel> _cart;
-        private int _itemQuantity;
-        private string _subTotal;
-        private string _tax;
-        private string _total;
+        private BindingList<ProductModel> _products;
+        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
+        private int _productQuantity = 1;
+        private decimal _subTotal;
+        private decimal _tax;
+        private decimal _total;
+        private ProductModel _selectedProduct;
         private readonly IProductEndpoint _productEndpoint;
 
         public SalesViewModel(IProductEndpoint productEndpoint)
@@ -28,25 +29,25 @@ namespace DRMDesktopUI.ViewModels
         protected override async void OnViewLoaded(object view)
         {
             base.OnViewLoaded(view);
-            await LoadItems();
+            await LoadProducts();
         }
 
-        private async Task LoadItems()
+        private async Task LoadProducts()
         {
-            Items = new BindingList<ProductModel>(await _productEndpoint.GetAll());
+            Products = new BindingList<ProductModel>(await _productEndpoint.GetAll());
         }
 
-        public BindingList<ProductModel> Items
+        public BindingList<ProductModel> Products
         {
-            get { return _items; }
+            get { return _products; }
             set
             {
-                _items = value;
-                NotifyOfPropertyChange(() => Items);
+                _products = value;
+                NotifyOfPropertyChange(() => Products);
             }
         }
 
-        public BindingList<ProductModel> Cart
+        public BindingList<CartItemModel> Cart
         {
             get { return _cart; }
             set
@@ -56,44 +57,49 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
-        public int ItemQuantity
+        public ProductModel SelectedProduct
         {
-            get { return _itemQuantity; }
+            get { return _selectedProduct; }
             set
             {
-                _itemQuantity = value;
-                NotifyOfPropertyChange(() => ItemQuantity);
+                _selectedProduct = value;
+                NotifyOfPropertyChange(() => SelectedProduct);
+                NotifyOfPropertyChange(() => CanAdd);
+            }
+        }
+
+        public int ProductQuantity
+        {
+            get { return _productQuantity; }
+            set
+            {
+                _productQuantity = value;
+                NotifyOfPropertyChange(() => ProductQuantity);
+                NotifyOfPropertyChange(() => CanAdd);
             }
         }
 
         public string SubTotal
         {
-            get { return _subTotal; }
-            set
+            get
             {
-                _subTotal = value;
-                NotifyOfPropertyChange(() => SubTotal);
+                foreach (var item in Cart)
+                {
+                    _subTotal += (item.Product.RetailPrice * item.QuantityInCart);
+                }
+
+                return _subTotal.ToString("C");
             }
         }
 
         public string Tax
         {
-            get { return _tax; }
-            set
-            {
-                _tax = value;
-                NotifyOfPropertyChange(() => Tax);
-            }
+            get { return _tax.ToString("C"); }
         }
 
         public string Total
         {
-            get { return _total; }
-            set
-            {
-                _total = value;
-                NotifyOfPropertyChange(() => Total);
-            }
+            get { return _total.ToString("C"); }
         }
 
         public bool CanAdd
@@ -101,6 +107,12 @@ namespace DRMDesktopUI.ViewModels
             get
             {
                 bool output = false;
+
+                if (ProductQuantity > 0 && SelectedProduct?.QuantityInStock >= ProductQuantity)
+                {
+                    output = true;
+                }
+
                 return output;
             }
         }
@@ -123,17 +135,36 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
-        public async Task Add()
+        public void Add()
+        {
+            CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
+
+            if (existingItem != null)
+            {
+                existingItem.QuantityInCart += ProductQuantity;
+                Cart.ResetBindings();
+            }
+            else
+            {
+                CartItemModel item = new CartItemModel
+                {
+                    Product = SelectedProduct,
+                    QuantityInCart = ProductQuantity
+                };
+                Cart.Add(item);
+            }
+
+            SelectedProduct.QuantityInStock -= ProductQuantity;
+            ProductQuantity = 1;
+            NotifyOfPropertyChange(() => SubTotal);
+        }
+
+        public void Remove()
         {
             throw new NotImplementedException();
         }
 
-        public async Task Remove()
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task Buy()
+        public void Buy()
         {
             throw new NotImplementedException();
         }

@@ -28,7 +28,7 @@
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Header -->
         <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3"
                    Margin="10" FontSize="64" Text="Sales Page"
@@ -36,9 +36,10 @@
 
         <!-- Products Column -->
         <TextBlock Grid.Row="2" Grid.Column="1" Text="Items"/>
-        <ListBox x:Name="Items" Grid.Row="3" Grid.Column="1"
-                 MinWidth="220" MinHeight="300">
-            
+        <ListBox x:Name="Products" Grid.Row="3" Grid.Column="1"
+                 MinWidth="220" MinHeight="300"
+                 SelectedItem="{Binding SelectedProduct}">
+
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Name}"/>
@@ -50,7 +51,7 @@
         <StackPanel Grid.Row="3" Grid.Column="2" Margin="20 0"
                     MinWidth="200">
             <TextBlock Text="Quantity" HorizontalAlignment="Center"/>
-            <TextBox x:Name="ItemQuantity" Margin="5 7.5"/>
+            <TextBox x:Name="ProductQuantity" Margin="5 7.5"/>
             <Button x:Name="Add" Content="Add" Margin="5 2.5"/>
             <Button x:Name="Remove" Content="Remove" Margin="5 2.5"/>
         </StackPanel>
@@ -58,7 +59,13 @@
         <!-- Cart Column -->
         <TextBlock Grid.Row="2" Grid.Column="3" Text="Cart"/>
         <ListBox x:Name="Cart" Grid.Row="3" Grid.Column="3"
-                 MinWidth="220" MinHeight="300"/>
+                 MinWidth="220" MinHeight="300">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayText}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
 
         <DockPanel Grid.Row="4" Grid.Column="3" MinWidth="220">
             <TextBlock Text="Sub Total:" Margin="5"/>
