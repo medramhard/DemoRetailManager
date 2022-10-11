@@ -191,6 +191,7 @@ namespace DRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            Products.ResetBindings();
         }
 
         public void Remove()
