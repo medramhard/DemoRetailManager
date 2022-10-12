@@ -16,6 +16,7 @@ namespace DRMDesktopUI.ViewModels
         private BindingList<ProductModel> _products;
         private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
         private int _productQuantity = 1;
+        private CartItemModel _selectedInCart;
         private ProductModel _selectedProduct;
         private readonly IProductEndpoint _productEndpoint;
         private readonly IConfigHelper _configHelper;
@@ -68,6 +69,7 @@ namespace DRMDesktopUI.ViewModels
             return output;
         }
 
+
         public BindingList<ProductModel> Products
         {
             get { return _products; }
@@ -99,6 +101,17 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
+        public CartItemModel SelectedInCart
+        {
+            get { return _selectedInCart; }
+            set
+            {
+                _selectedInCart = value;
+                NotifyOfPropertyChange(() => SelectedInCart);
+                NotifyOfPropertyChange(() => CanRemove);
+            }
+        }
+
         public int ProductQuantity
         {
             get { return _productQuantity; }
@@ -107,6 +120,7 @@ namespace DRMDesktopUI.ViewModels
                 _productQuantity = value;
                 NotifyOfPropertyChange(() => ProductQuantity);
                 NotifyOfPropertyChange(() => CanAdd);
+                NotifyOfPropertyChange(() => CanRemove);
             }
         }
 
@@ -154,6 +168,12 @@ namespace DRMDesktopUI.ViewModels
             get
             {
                 bool output = false;
+
+                if (ProductQuantity > 0 && SelectedInCart?.QuantityInCart >= ProductQuantity)
+                {
+                    output = true;
+                }
+
                 return output;
             }
         }
@@ -163,9 +183,16 @@ namespace DRMDesktopUI.ViewModels
             get
             {
                 bool output = false;
+
+                if (Cart?.Count > 0)
+                {
+                    output = true;
+                }
+
                 return output;
             }
         }
+
 
         public void Add()
         {
@@ -188,23 +215,39 @@ namespace DRMDesktopUI.ViewModels
 
             SelectedProduct.QuantityInStock -= ProductQuantity;
             ProductQuantity = 1;
+            Products.ResetBindings();
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
-            Products.ResetBindings();
+            NotifyOfPropertyChange(() => CanBuy);
         }
 
         public void Remove()
         {
+            ProductModel product = Products.FirstOrDefault(x => x == SelectedInCart.Product);
+
+            product.QuantityInStock += ProductQuantity;
+            SelectedInCart.QuantityInCart -= ProductQuantity;
+
+            if (SelectedInCart.QuantityInCart < 1)
+            {
+                Cart.Remove(SelectedInCart);
+            }
+
+            ProductQuantity = 1;
+            Products.ResetBindings();
+            Cart.ResetBindings();
 
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanBuy);
         }
 
         public void Buy()
         {
             throw new NotImplementedException();
+            // Cart.Clear();
         }
     }
 }

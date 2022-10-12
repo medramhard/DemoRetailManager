@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigHelper.cs" />
     <Compile Include="Data\ProductData.cs" />
     <Compile Include="Data\UserData.cs" />
     <Compile Include="Models\ProductModel.cs" />
