@@ -19,11 +19,13 @@ namespace DRMDesktopUI.ViewModels
         private CartItemModel _selectedInCart;
         private ProductModel _selectedProduct;
         private readonly IProductEndpoint _productEndpoint;
+        private readonly ISaleEndpoint _saleEndpoint;
         private readonly IConfigHelper _configHelper;
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IConfigHelper configHelper)
         {
             _productEndpoint = productEndpoint;
+            _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
         }
 
@@ -244,10 +246,30 @@ namespace DRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => CanBuy);
         }
 
-        public void Buy()
+        public async Task Buy()
         {
-            throw new NotImplementedException();
-            // Cart.Clear();
+            SaleModel sale = new SaleModel();
+
+            foreach (var item in Cart)
+            {
+                sale.SaleDetails.Add(new SaleDetailModel
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });
+            }
+
+            // TODO: Make an API call
+            await _saleEndpoint.Post(sale);
+
+            ProductQuantity = 1;
+            Cart.Clear();
+            Cart.ResetBindings();
+
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanBuy);
         }
     }
 }

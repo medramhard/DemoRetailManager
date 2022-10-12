@@ -27,5 +27,15 @@ namespace DRMDataManagerLibrary.DataAccess
                 await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
             }
         }
+
+        public async Task<int> SaveEntry<T>(string storedProcedure, T parameters, string cnnName)
+        {
+            using (IDbConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString))
+            {
+                int identity = await connection.QuerySingleAsync<int>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
+                return identity;
+            }
+
+        }
     }
 }

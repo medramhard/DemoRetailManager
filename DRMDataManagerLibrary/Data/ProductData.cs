@@ -21,5 +21,10 @@ namespace DRMDataManagerLibrary.Data
         {
             return await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_GetAll]", new { }, "DRMData");
         }
+
+        public async Task<ProductModel> Get(int id)
+        {
+            return (await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_Get]", new { Id = id}, "DRMData")).FirstOrDefault();
+        }
     }
 }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace DRMDataManagerLibrary
 {
-    public class ConfigHelper
+    public static class ConfigHelper
     {
-        public decimal GetTaxRate()
+        public static decimal GetTaxRate()
         {
             string rateText = ConfigurationManager.AppSettings["taxRate"];
 
