@@ -1,4 +1,6 @@
-﻿using Caliburn.Micro;
+﻿using AutoMapper;
+using Caliburn.Micro;
+using DRMDesktopUI.Models;
 using DRMDesktopUILibrary.Api;
 using DRMDesktopUILibrary.Helpers;
 using DRMDesktopUILibrary.Models;
@@ -13,20 +15,22 @@ namespace DRMDesktopUI.ViewModels
 {
     public class SalesViewModel : Screen
     {
-        private BindingList<ProductModel> _products;
-        private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
+        private BindingList<ProductDisplayModel> _products;
+        private BindingList<CartItemDisplayModel> _cart = new BindingList<CartItemDisplayModel>();
         private int _productQuantity = 1;
-        private CartItemModel _selectedInCart;
-        private ProductModel _selectedProduct;
+        private CartItemDisplayModel _selectedInCart;
+        private ProductDisplayModel _selectedProduct;
         private readonly IProductEndpoint _productEndpoint;
         private readonly ISaleEndpoint _saleEndpoint;
         private readonly IConfigHelper _configHelper;
+        private readonly IMapper _mapper;
 
-        public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IConfigHelper configHelper, IMapper mapper)
         {
             _productEndpoint = productEndpoint;
             _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
+            _mapper = mapper;
         }
 
         protected override async void OnViewLoaded(object view)
@@ -37,7 +41,8 @@ namespace DRMDesktopUI.ViewModels
 
         private async Task LoadProducts()
         {
-            Products = new BindingList<ProductModel>(await _productEndpoint.GetAll());
+            var results = new BindingList<ProductModel>(await _productEndpoint.GetAll());
+            Products = new BindingList<ProductDisplayModel>(_mapper.Map<List<ProductDisplayModel>>(results));
         }
 
         private decimal CalculateSubTotal()
@@ -72,7 +77,7 @@ namespace DRMDesktopUI.ViewModels
         }
 
 
-        public BindingList<ProductModel> Products
+        public BindingList<ProductDisplayModel> Products
         {
             get { return _products; }
             set
@@ -82,7 +87,7 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
-        public BindingList<CartItemModel> Cart
+        public BindingList<CartItemDisplayModel> Cart
         {
             get { return _cart; }
             set
@@ -92,7 +97,7 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
-        public ProductModel SelectedProduct
+        public ProductDisplayModel SelectedProduct
         {
             get { return _selectedProduct; }
             set
@@ -103,7 +108,7 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
-        public CartItemModel SelectedInCart
+        public CartItemDisplayModel SelectedInCart
         {
             get { return _selectedInCart; }
             set
@@ -156,7 +161,7 @@ namespace DRMDesktopUI.ViewModels
             {
                 bool output = false;
 
-                if (ProductQuantity > 0 && SelectedProduct?.QuantityInStock >= ProductQuantity)
+                if (SelectedProduct?.QuantityInStock > 0)
                 {
                     output = true;
                 }
@@ -171,7 +176,7 @@ namespace DRMDesktopUI.ViewModels
             {
                 bool output = false;
 
-                if (ProductQuantity > 0 && SelectedInCart?.QuantityInCart >= ProductQuantity)
+                if (SelectedInCart?.QuantityInCart > 0)
                 {
                     output = true;
                 }
@@ -198,16 +203,15 @@ namespace DRMDesktopUI.ViewModels
 
         public void Add()
         {
-            CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
+            CartItemDisplayModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
 
             if (existingItem != null)
             {
                 existingItem.QuantityInCart += ProductQuantity;
-                Cart.ResetBindings();
             }
             else
             {
-                CartItemModel item = new CartItemModel
+                CartItemDisplayModel item = new CartItemDisplayModel
                 {
                     Product = SelectedProduct,
                     QuantityInCart = ProductQuantity
@@ -217,7 +221,6 @@ namespace DRMDesktopUI.ViewModels
 
             SelectedProduct.QuantityInStock -= ProductQuantity;
             ProductQuantity = 1;
-            Products.ResetBindings();
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
@@ -226,7 +229,7 @@ namespace DRMDesktopUI.ViewModels
 
         public void Remove()
         {
-            ProductModel product = Products.FirstOrDefault(x => x == SelectedInCart.Product);
+            ProductDisplayModel product = Products.FirstOrDefault(x => x == SelectedInCart.Product);
 
             product.QuantityInStock += ProductQuantity;
             SelectedInCart.QuantityInCart -= ProductQuantity;
@@ -237,8 +240,6 @@ namespace DRMDesktopUI.ViewModels
             }
 
             ProductQuantity = 1;
-            Products.ResetBindings();
-            Cart.ResetBindings();
 
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
@@ -264,7 +265,6 @@ namespace DRMDesktopUI.ViewModels
 
             ProductQuantity = 1;
             Cart.Clear();
-            Cart.ResetBindings();
 
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
