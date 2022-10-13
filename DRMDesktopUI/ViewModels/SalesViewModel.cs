@@ -44,6 +44,16 @@ namespace DRMDesktopUI.ViewModels
             var results = new BindingList<ProductModel>(await _productEndpoint.GetAll());
             Products = new BindingList<ProductDisplayModel>(_mapper.Map<List<ProductDisplayModel>>(results));
         }
+        private async Task ResetSaleViewmodel()
+        {
+            Cart = new BindingList<CartItemDisplayModel>();
+            await LoadProducts();
+
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanBuy);
+        }
 
         private decimal CalculateSubTotal()
         {
@@ -260,16 +270,9 @@ namespace DRMDesktopUI.ViewModels
                 });
             }
 
-            // TODO: Make an API call
             await _saleEndpoint.Post(sale);
-
             ProductQuantity = 1;
-            Cart.Clear();
-
-            NotifyOfPropertyChange(() => SubTotal);
-            NotifyOfPropertyChange(() => Tax);
-            NotifyOfPropertyChange(() => Total);
-            NotifyOfPropertyChange(() => CanBuy);
+            await ResetSaleViewmodel();
         }
     }
 }

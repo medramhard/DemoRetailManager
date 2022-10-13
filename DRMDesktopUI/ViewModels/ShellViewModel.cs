@@ -1,5 +1,6 @@
 ﻿using Caliburn.Micro;
 using DRMDesktopUI.EventModels;
+using DRMDesktopUILibrary.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,20 +14,49 @@ namespace DRMDesktopUI.ViewModels
     {
         private readonly SalesViewModel _salesVM;
         private readonly IEventAggregator _events;
+        private readonly ILoggedInUserModel _user;
 
-        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events)
+        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, ILoggedInUserModel user)
         {
             _salesVM = salesVM;
             _events = events;
-
+            _user = user;
             _events.SubscribeOnPublishedThread(this);
 
             ActivateItemAsync(IoC.Get<LoginViewModel>());
         }
 
-        public Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
+        public bool IsLoggedIn
         {
-            return ActivateItemAsync(_salesVM);
+            get
+            {
+                bool output = false;
+
+                if (string.IsNullOrWhiteSpace(_user.Token) == false)
+                {
+                    output = true;
+                }
+
+                return output;
+            }
+        }
+
+        public void LogOut()
+        {
+            _user.LogOut();
+            ActivateItemAsync(IoC.Get<LoginViewModel>());
+            NotifyOfPropertyChange(() => IsLoggedIn);
+        }
+
+        public async Task ExitApplication()
+        {
+            await TryCloseAsync();
+        }
+
+        public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
+        {
+            await ActivateItemAsync(_salesVM);
+            NotifyOfPropertyChange(() => IsLoggedIn);
         }
     }
 }

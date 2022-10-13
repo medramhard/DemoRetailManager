@@ -10,7 +10,7 @@ namespace DRMDesktopUI.ViewModels
     {
 		private string _userName;
 		private string _password;
-		private bool _isErrorVisible;
+		private string _errorMessage;
 		private readonly IApiHelper _api;
 		private readonly IEventAggregator _events;
 
@@ -69,8 +69,6 @@ namespace DRMDesktopUI.ViewModels
 				return true; 
 			}
 		}
-
-		private string _errorMessage;
 
 		public string ErrorMessage
 		{
