@@ -10,13 +10,6 @@ namespace DRMDataManagerLibrary.Data
 {
     public class SaleData
     {
-        private readonly SqlDataAccess _db;
-
-        public SaleData()
-        {
-            _db = new SqlDataAccess();
-        }
-
         // NEEDS REFACTORING
         public async Task Add(SaleModel saleInfo, string cashierId)
         {
@@ -39,7 +32,7 @@ namespace DRMDataManagerLibrary.Data
 
                     if (product.IsTaxable)
                     {
-                        detail.Tax = detail.PurchasePrice * taxRate / 100; 
+                        detail.Tax = detail.PurchasePrice * taxRate / 100;
                     }
 
                     details.Add(detail);
@@ -47,26 +40,38 @@ namespace DRMDataManagerLibrary.Data
                 catch (Exception)
                 {
 
-                    throw new Exception($"The product Id of { item.ProductId } could not be found in the database.");
+                    throw new Exception($"The product Id of {item.ProductId} could not be found in the database.");
                 }
             }
 
             SaleDBModel sale = new SaleDBModel()
             {
-               SubTotal = details.Sum(x => x.PurchasePrice),
-               Tax = details.Sum(x => x.Tax),
-               CashierId = cashierId
+                SubTotal = details.Sum(x => x.PurchasePrice),
+                Tax = details.Sum(x => x.Tax),
+                CashierId = cashierId
             };
 
             sale.Total = sale.SubTotal + sale.Tax;
-            sale.Id = await _db.SaveEntry("[dbo].[spSale_Add]",
-                new { sale.CashierId, sale.SaleDate, sale.SubTotal, sale.Tax, sale.Total },
-                "DRMData");
 
-            foreach (var item in details)
+            using (SqlDataAccess db = new SqlDataAccess())
             {
-                item.SaleId = sale.Id;
-                await _db.SaveData("[dbo].[spSaleDetail_Add]", item, "DRMData");
+                try
+                {
+                    db.StartTransaction("DRMData");
+                    sale.Id = await db.SaveAndGetIdInTransaction("[dbo].[spSale_Add]",
+                    new { sale.CashierId, sale.SaleDate, sale.SubTotal, sale.Tax, sale.Total });
+
+                    foreach (var item in details)
+                    {
+                        item.SaleId = sale.Id;
+                        await db.SaveDataInTransaction("[dbo].[spSaleDetail_Add]", item);
+                    }
+                }
+                catch
+                {
+                    db.RollBackTransaction();
+                    throw;
+                }
             }
         }
     }

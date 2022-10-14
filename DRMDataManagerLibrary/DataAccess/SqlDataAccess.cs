@@ -10,14 +10,22 @@ using System.Threading.Tasks;
 
 namespace DRMDataManagerLibrary.DataAccess
 {
-    internal class SqlDataAccess
+    public class SqlDataAccess : IDisposable
     {
+        private IDbConnection _connection;
+        private IDbTransaction _transaction;
+
         public async Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string cnnName)
         {
             using (IDbConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString))
             {
                 return (await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure)).ToList();
             }
+        }
+
+        public async Task<List<T>> LoadDataInTransaction<T, U>(string storedProcedure, U parameters)
+        {
+            return (await _connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction)).ToList();
         }
 
         public async Task SaveData<T>(string storedProcedure, T parameters, string cnnName)
@@ -28,14 +36,47 @@ namespace DRMDataManagerLibrary.DataAccess
             }
         }
 
-        public async Task<int> SaveEntry<T>(string storedProcedure, T parameters, string cnnName)
+        public async Task SaveDataInTransaction<T>(string storedProcedure, T parameters)
+        {
+            await _connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction);
+        }
+
+        public async Task<int> SaveAndGetId<T>(string storedProcedure, T parameters, string cnnName)
         {
             using (IDbConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString))
             {
-                int identity = await connection.QuerySingleAsync<int>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-                return identity;
+                return await connection.QuerySingleAsync<int>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
             }
 
+        }
+
+        public async Task<int> SaveAndGetIdInTransaction<T>(string storedProcedure, T parameters)
+        {
+            return await _connection.QuerySingleAsync<int>(storedProcedure, parameters, commandType: CommandType.StoredProcedure, transaction: _transaction);
+        }
+
+        public void StartTransaction(string cnnName)
+        {
+            _connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString);
+            _connection.Open();
+            _transaction = _connection.BeginTransaction();
+        }
+
+        public void CommitTransaction()
+        {
+            _transaction?.Commit();
+            _connection?.Close();
+        }
+
+        public void RollBackTransaction()
+        {
+            _transaction?.Rollback();
+            _connection?.Close();
+        }
+
+        public void Dispose()
+        {
+            CommitTransaction();
         }
     }
 }
