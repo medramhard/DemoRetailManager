@@ -13,6 +13,7 @@ namespace DataManager.Controllers
     [Authorize]
     public class InventoryController : ApiController
     {
+        [Authorize(Roles = "Admin,Manager")]
         [HttpGet]
         public async Task<IHttpActionResult> Get()
         {
@@ -29,6 +30,7 @@ namespace DataManager.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IHttpActionResult> Post(InventoryItemModel item)
         {

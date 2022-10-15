@@ -15,6 +15,7 @@ namespace DataManager.Controllers
     [Authorize]
     public class SaleController : ApiController
     {
+        [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         [Route("Report")]
         public async Task<IHttpActionResult> GetReport()
@@ -32,6 +33,7 @@ namespace DataManager.Controllers
             }
         }
 
+        [Authorize(Roles = "Cashier")]
         [HttpPost]
         public async Task<IHttpActionResult> Post(SaleModel sale)
         {
