@@ -77,5 +77,12 @@ namespace DRMDataManagerLibrary.Data
                 }
             }
         }
+
+        public async Task<List<SaleReportModel>> GetSaleReport()
+        {
+            SqlDataAccess db = new SqlDataAccess();
+
+            return await db.LoadData<SaleReportModel, dynamic>("[dbo].[spSale_GetSaleReport]", new { }, "DRMData");
+        }
     }
 }

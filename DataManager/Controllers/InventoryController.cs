@@ -1,7 +1,5 @@
-﻿using DataManager.Models;
-using DRMDataManagerLibrary.Data;
+﻿using DRMDataManagerLibrary.Data;
 using DRMDataManagerLibrary.Models;
-using Microsoft.AspNet.Identity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,18 +11,17 @@ using System.Web.Http;
 namespace DataManager.Controllers
 {
     [Authorize]
-    public class SaleController : ApiController
+    public class InventoryController : ApiController
     {
         [HttpGet]
-        [Route("Report")]
-        public async Task<IHttpActionResult> GetReport()
+        public async Task<IHttpActionResult> Get()
         {
             try
             {
-                SaleData data = new SaleData();
+                InventoryData data = new InventoryData();
 
-                var report = await data.GetSaleReport();
-                return Ok(report);
+                var item = await data.GetAll();
+                return Ok(item);
             }
             catch (Exception ex)
             {
@@ -33,14 +30,13 @@ namespace DataManager.Controllers
         }
 
         [HttpPost]
-        public async Task<IHttpActionResult> Post(SaleModel sale)
+        public async Task<IHttpActionResult> Post(InventoryItemModel item)
         {
             try
             {
-                SaleData data = new SaleData();
-                string cashierId = RequestContext.Principal.Identity.GetUserId();
+                InventoryData data = new InventoryData();
 
-                await data.Add(sale, cashierId);
+                await data.Add(item);
                 return Ok();
             }
             catch (Exception ex)
