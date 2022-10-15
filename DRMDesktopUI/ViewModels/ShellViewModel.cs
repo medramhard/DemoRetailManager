@@ -41,6 +41,12 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
+        public void UserManagement()
+        {
+            ActivateItemAsync(IoC.Get<UserDisplayViewModel>());
+
+        }
+
         public void LogOut()
         {
             _user.LogOut();

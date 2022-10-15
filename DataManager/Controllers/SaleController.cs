@@ -17,7 +17,7 @@ namespace DataManager.Controllers
     {
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
-        [Route("Report")]
+        [Route("api/Report")]
         public async Task<IHttpActionResult> GetReport()
         {
             try

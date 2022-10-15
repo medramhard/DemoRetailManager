@@ -47,6 +47,7 @@ namespace DRMDesktopUI
 
             _container.Instance(_container)
                 .PerRequest<ISaleEndpoint, SaleEndpoint>()
+                .PerRequest<IUserEndpoint, UserEndpoint>()
                 .PerRequest<IProductEndpoint, ProductEndpoint>();
 
             _container

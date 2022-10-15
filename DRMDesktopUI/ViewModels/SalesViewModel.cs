@@ -56,14 +56,13 @@ namespace DRMDesktopUI.ViewModels
                 if (ex.Message.ToLower() == "unauthorized")
                 {
                     _status.UpdateMessage("Unathorized Access", "You do not have permission to interact with Sale Page");
-                    _window.ShowDialogAsync(_status, null, settings);
                 }
                 else
                 {
                     _status.UpdateMessage("Fatal Exception", ex.Message);
-                    _window.ShowDialogAsync(_status, null, settings);
                 }
 
+                _window.ShowDialogAsync(_status, null, settings);
                 await TryCloseAsync();
             }
         }
