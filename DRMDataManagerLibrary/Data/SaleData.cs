@@ -58,6 +58,7 @@ namespace DRMDataManagerLibrary.Data
                 try
                 {
                     db.StartTransaction("DRMData");
+
                     sale.Id = await db.SaveAndGetIdInTransaction("[dbo].[spSale_Add]",
                     new { sale.CashierId, sale.SaleDate, sale.SubTotal, sale.Tax, sale.Total });
 
@@ -66,6 +67,8 @@ namespace DRMDataManagerLibrary.Data
                         item.SaleId = sale.Id;
                         await db.SaveDataInTransaction("[dbo].[spSaleDetail_Add]", item);
                     }
+
+                    db.CommitTransaction();
                 }
                 catch
                 {

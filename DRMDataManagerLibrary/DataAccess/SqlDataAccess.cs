@@ -14,6 +14,7 @@ namespace DRMDataManagerLibrary.DataAccess
     {
         private IDbConnection _connection;
         private IDbTransaction _transaction;
+        private bool _isClosed = false;
 
         public async Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string cnnName)
         {
@@ -60,23 +61,40 @@ namespace DRMDataManagerLibrary.DataAccess
             _connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString);
             _connection.Open();
             _transaction = _connection.BeginTransaction();
+            _isClosed = false;
         }
 
         public void CommitTransaction()
         {
             _transaction?.Commit();
             _connection?.Close();
+            _isClosed = true;
         }
 
         public void RollBackTransaction()
         {
             _transaction?.Rollback();
             _connection?.Close();
+            _isClosed = true;
         }
 
         public void Dispose()
         {
-            CommitTransaction();
+            if (_isClosed == false)
+            {
+                try
+                {
+                    CommitTransaction();
+                }
+                catch
+                {
+                    // TODO: make a proper exception handling, log this issue
+                    throw;
+                }
+            }
+
+            _transaction = null;
+            _connection = null;
         }
     }
 }
