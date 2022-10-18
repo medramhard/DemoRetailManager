@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DRMDesktopUI.Views"
              mc:Ignorable="d" Background="White" FontSize="24"
-             d:DesignHeight="550" d:DesignWidth="800">
+             d:DesignHeight="650" d:DesignWidth="800">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
@@ -40,7 +40,8 @@
                    HorizontalAlignment="Left"/>
         <!-- User List Body -->
         <ListBox x:Name="Users" Grid.Row="4" Grid.Column="1"
-                 MinWidth="220" MinHeight="300" Grid.ColumnSpan="3">
+                 MinWidth="220" MinHeight="300" Grid.ColumnSpan="2"
+                 SelectedItem="{Binding SelectedUser}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">
@@ -54,6 +55,32 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        
+        <!-- Interactivity Block-->
+        <!-- DOES NOT WORK NEEDS REFACTORING -->
+        <StackPanel Orientation="Vertical" Grid.Row="4" Grid.Column="3"
+                    Margin="10 0">
+            <TextBlock Text="Roles in use"/>
+            <ListBox x:Name="SelectedUserRoles" MinHeight="110"
+                     SelectedItem="{Binding SelectedUserRole}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button x:Name="Remove" Content="Remove" Margin="10"/>
+            <TextBlock Text="Available roles"/>
+            <ListBox x:Name="AvailableRoles" MinHeight="110"
+                     SelectedItem="{Binding SelectedAvailableRole}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button x:Name="Add" Content="Add" Margin="10"/>
+        </StackPanel>
         
     </Grid>
 </UserControl>

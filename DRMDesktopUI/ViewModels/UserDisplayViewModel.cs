@@ -19,6 +19,12 @@ namespace DRMDesktopUI.ViewModels
         private readonly IUserEndpoint _userEndpoint;
         private readonly IWindowManager _window;
         private readonly StatusInfoViewModel _status;
+        private BindingList<UserModel> _users;
+        private BindingList<UserRoleModel> _selectedUserRoles;
+        private BindingList<UserRoleModel> _availableRoles;
+        private UserModel _selectedUser;
+        private UserRoleModel _selectedUserRole;
+        private UserRoleModel _selectedAvailableRole;
 
         public UserDisplayViewModel(IUserEndpoint userEndpoint, IWindowManager window, StatusInfoViewModel status)
         {
@@ -33,6 +39,7 @@ namespace DRMDesktopUI.ViewModels
             try
             {
                 await LoadUsers();
+                await LoadRoles();
             }
             catch (Exception ex)
             {
@@ -59,8 +66,10 @@ namespace DRMDesktopUI.ViewModels
         {
             Users = new BindingList<UserModel>(await _userEndpoint.GetAll());
         }
-
-        private BindingList<UserModel> _users;
+        private async Task LoadRoles()
+        {
+            AvailableRoles = new BindingList<UserRoleModel>(await _userEndpoint.GetAllRoles());
+        }
 
         public BindingList<UserModel> Users
         {
@@ -75,5 +84,120 @@ namespace DRMDesktopUI.ViewModels
             }
         }
 
+        public BindingList<UserRoleModel> SelectedUserRoles
+        {
+            get { return _selectedUserRoles; }
+            private set
+            {
+                _selectedUserRoles = value;
+
+                NotifyOfPropertyChange(() => Users);
+                NotifyOfPropertyChange(() => SelectedUser);
+                NotifyOfPropertyChange(() => SelectedUserRoles);
+            }
+        }
+
+        public BindingList<UserRoleModel> AvailableRoles
+        {
+            get { return _availableRoles; }
+            set
+            {
+                _availableRoles = value;
+                NotifyOfPropertyChange(() => AvailableRoles);
+            }
+        }
+
+        public UserModel SelectedUser
+        {
+            get { return _selectedUser; }
+            set
+            {
+                _selectedUser = value;
+                _selectedUserRoles = new BindingList<UserRoleModel>(SelectedUser.Roles);
+
+                NotifyOfPropertyChange(() => Users);
+                NotifyOfPropertyChange(() => SelectedUser);
+                NotifyOfPropertyChange(() => SelectedUserRoles);
+            }
+        }
+
+        public UserRoleModel SelectedUserRole
+        {
+            get { return _selectedUserRole; }
+            set
+            {
+                _selectedUserRole = value;
+
+                NotifyOfPropertyChange(() => SelectedUserRole);
+                NotifyOfPropertyChange(() => CanRemove);
+            }
+        }
+
+        public UserRoleModel SelectedAvailableRole
+        {
+            get { return _selectedAvailableRole; }
+            set
+            {
+                _selectedAvailableRole = value;
+                NotifyOfPropertyChange(() => SelectedAvailableRole);
+                NotifyOfPropertyChange(() => CanAdd);
+            }
+        }
+
+        public bool CanRemove
+        {
+            get
+            {
+                bool output = false;
+
+                if (SelectedUserRole != null)
+                {
+                    output = true;
+                }
+
+                return output;
+            }
+        }
+
+        public bool CanAdd
+        {
+            get
+            {
+                bool output = false;
+
+                if (SelectedUserRoles?.Any(x => x.Id == SelectedAvailableRole?.Id) == false)
+                {
+                    output = true;
+                }
+
+                return output;
+            }
+        }
+
+        public async Task Add()
+        {
+            await _userEndpoint.AddUserToRole(SelectedUser.Id, SelectedAvailableRole.Name);
+            Users.FirstOrDefault(x => x.Id == SelectedUser.Id).Roles.Add(SelectedAvailableRole);
+            SelectedUserRoles.ResetBindings();
+
+            NotifyOfPropertyChange(() => Users);
+            NotifyOfPropertyChange(() => SelectedUser);
+            NotifyOfPropertyChange(() => SelectedUserRoles);
+            NotifyOfPropertyChange(() => SelectedAvailableRole);
+            NotifyOfPropertyChange(() => CanAdd);
+        }
+
+        public async Task Remove()
+        {
+            await _userEndpoint.RemoveUserFromRole(SelectedUser.Id, SelectedUserRole.Name);
+            Users.FirstOrDefault(x => x.Id == SelectedUser.Id).Roles.RemoveAll(x => x.Id == SelectedUserRole.Id);
+            SelectedUserRoles.ResetBindings();
+
+            NotifyOfPropertyChange(() => Users);
+            NotifyOfPropertyChange(() => SelectedUser);
+            NotifyOfPropertyChange(() => SelectedUserRoles);
+            NotifyOfPropertyChange(() => CanAdd);
+            NotifyOfPropertyChange(() => CanRemove);
+        }
     }
 }

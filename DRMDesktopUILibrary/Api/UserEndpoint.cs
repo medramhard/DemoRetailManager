@@ -31,5 +31,42 @@ namespace DRMDesktopUILibrary.Api
                 }
             }
         }
+
+        public async Task<List<UserRoleModel>> GetAllRoles()
+        {
+            using (var response = await _apiHelper.ApiClient.GetAsync("api/User/Admin/GetAllRoles"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    return await response.Content.ReadAsAsync<List<UserRoleModel>>();
+                }
+                else
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+        public async Task AddUserToRole(string userId, string roleName)
+        {
+            using (var response = await _apiHelper.ApiClient.PostAsJsonAsync("api/User/Admin/AddRole", new { userId, roleName }))
+            {
+                if (response.IsSuccessStatusCode == false)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
+
+        public async Task RemoveUserFromRole(string userId, string roleName)
+        {
+            using (var response = await _apiHelper.ApiClient.PostAsJsonAsync("api/User/Admin/RemoveRole", new { userId, roleName }))
+            {
+                if (response.IsSuccessStatusCode == false)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
     }
 }
