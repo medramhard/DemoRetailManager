@@ -66,9 +66,23 @@ namespace DRMDesktopUI.ViewModels
         {
             Users = new BindingList<UserModel>(await _userEndpoint.GetAll());
         }
+
         private async Task LoadRoles()
         {
             AvailableRoles = new BindingList<UserRoleModel>(await _userEndpoint.GetAllRoles());
+        }
+
+        private void RefreshPage()
+        {
+            SelectedUserRoles.ResetBindings();
+            Users.ResetBindings();
+
+            NotifyOfPropertyChange(() => Users);
+            NotifyOfPropertyChange(() => SelectedUser);
+            NotifyOfPropertyChange(() => SelectedUserRoles);
+            NotifyOfPropertyChange(() => SelectedAvailableRole);
+            NotifyOfPropertyChange(() => CanAdd);
+            NotifyOfPropertyChange(() => CanRemove);
         }
 
         public BindingList<UserModel> Users
@@ -178,26 +192,14 @@ namespace DRMDesktopUI.ViewModels
         {
             await _userEndpoint.AddUserToRole(SelectedUser.Id, SelectedAvailableRole.Name);
             Users.FirstOrDefault(x => x.Id == SelectedUser.Id).Roles.Add(SelectedAvailableRole);
-            SelectedUserRoles.ResetBindings();
-
-            NotifyOfPropertyChange(() => Users);
-            NotifyOfPropertyChange(() => SelectedUser);
-            NotifyOfPropertyChange(() => SelectedUserRoles);
-            NotifyOfPropertyChange(() => SelectedAvailableRole);
-            NotifyOfPropertyChange(() => CanAdd);
+            RefreshPage();
         }
 
         public async Task Remove()
         {
             await _userEndpoint.RemoveUserFromRole(SelectedUser.Id, SelectedUserRole.Name);
             Users.FirstOrDefault(x => x.Id == SelectedUser.Id).Roles.RemoveAll(x => x.Id == SelectedUserRole.Id);
-            SelectedUserRoles.ResetBindings();
-
-            NotifyOfPropertyChange(() => Users);
-            NotifyOfPropertyChange(() => SelectedUser);
-            NotifyOfPropertyChange(() => SelectedUserRoles);
-            NotifyOfPropertyChange(() => CanAdd);
-            NotifyOfPropertyChange(() => CanRemove);
+            RefreshPage();
         }
     }
 }
