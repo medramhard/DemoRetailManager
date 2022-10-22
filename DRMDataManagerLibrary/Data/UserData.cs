@@ -1,5 +1,6 @@
 ﻿using DRMDataManagerLibrary.DataAccess;
 using DRMDataManagerLibrary.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,16 +11,18 @@ namespace DRMDataManagerLibrary.Data
 {
     public class UserData
     {
-        private readonly SqlDataAccess _db;
+        private readonly IConfiguration _config;
 
-        public UserData()
+        public UserData(IConfiguration config)
         {
-            _db = new SqlDataAccess();
+            _config = config;
         }
 
         public async Task<UserModel> GetUser(string id)
         {
-            return (await _db.LoadData<UserModel, dynamic>("[dbo].[spUser_Get]", new { Id = id }, "DRMData")).First();
+            SqlDataAccess db = new SqlDataAccess(_config);
+
+            return (await db.LoadData<UserModel, dynamic>("[dbo].[spUser_Get]", new { Id = id }, "DRMData")).First();
         }
     }
 }

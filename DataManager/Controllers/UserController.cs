@@ -3,6 +3,7 @@ using DRMDataManagerLibrary.Data;
 using DRMDataManagerLibrary.Models;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -18,13 +19,20 @@ namespace DataManager.Controllers
     [Authorize]
     public class UserController : ApiController
     {
+        private readonly IConfiguration _config;
+
+        public UserController(IConfiguration config)
+        {
+            _config = config;
+        }
+
         [HttpGet]
         [ResponseType(typeof(UserModel))]
         public async Task<IHttpActionResult> Get()
         {
             try
             {
-                UserData data = new UserData();
+                UserData data = new UserData(_config);
                 string id = RequestContext.Principal.Identity.GetUserId();
                 var user = await data.GetUser(id);
 

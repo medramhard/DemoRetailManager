@@ -11,13 +11,20 @@ namespace DRMApi.Controllers;
 [ApiController]
 public class InventoryController : ControllerBase
 {
+    private readonly IConfiguration _config;
+
+    public InventoryController(IConfiguration config)
+    {
+        _config = config;
+    }
+
     [Authorize(Roles = "Admin,Manager")]
     [HttpGet]
     public async Task<IResult> Get()
     {
         try
         {
-            InventoryData data = new();
+            InventoryData data = new(_config);
 
             var item = await data.GetAll();
             return Results.Ok(item);
@@ -34,7 +41,7 @@ public class InventoryController : ControllerBase
     {
         try
         {
-            InventoryData data = new();
+            InventoryData data = new(_config);
 
             await data.Add(item);
             return Results.Ok();

@@ -2,6 +2,7 @@
 using DRMDataManagerLibrary.Data;
 using DRMDataManagerLibrary.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,13 @@ namespace DataManager.Controllers
     [Authorize]
     public class SaleController : ApiController
     {
+        private readonly IConfiguration _config;
+
+        public SaleController(IConfiguration config)
+        {
+            _config = config;
+        }
+
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         [Route("api/Report")]
@@ -22,7 +30,7 @@ namespace DataManager.Controllers
         {
             try
             {
-                SaleData data = new SaleData();
+                SaleData data = new SaleData(_config);
 
                 var report = await data.GetSaleReport();
                 return Ok(report);
@@ -39,7 +47,7 @@ namespace DataManager.Controllers
         {
             try
             {
-                SaleData data = new SaleData();
+                SaleData data = new SaleData(_config);
                 string cashierId = RequestContext.Principal.Identity.GetUserId();
 
                 await data.Add(sale, cashierId);
