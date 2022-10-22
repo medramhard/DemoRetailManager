@@ -16,13 +16,6 @@ namespace DataManager.Controllers
     [Authorize]
     public class SaleController : ApiController
     {
-        private readonly IConfiguration _config;
-
-        public SaleController(IConfiguration config)
-        {
-            _config = config;
-        }
-
         [Authorize(Roles = "Admin, Manager")]
         [HttpGet]
         [Route("api/Report")]
@@ -30,7 +23,7 @@ namespace DataManager.Controllers
         {
             try
             {
-                SaleData data = new SaleData(_config);
+                SaleData data = new SaleData();
 
                 var report = await data.GetSaleReport();
                 return Ok(report);
@@ -47,7 +40,7 @@ namespace DataManager.Controllers
         {
             try
             {
-                SaleData data = new SaleData(_config);
+                SaleData data = new SaleData();
                 string cashierId = RequestContext.Principal.Identity.GetUserId();
 
                 await data.Add(sale, cashierId);

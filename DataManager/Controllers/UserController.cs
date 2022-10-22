@@ -19,20 +19,13 @@ namespace DataManager.Controllers
     [Authorize]
     public class UserController : ApiController
     {
-        private readonly IConfiguration _config;
-
-        public UserController(IConfiguration config)
-        {
-            _config = config;
-        }
-
         [HttpGet]
         [ResponseType(typeof(UserModel))]
         public async Task<IHttpActionResult> Get()
         {
             try
             {
-                UserData data = new UserData(_config);
+                UserData data = new UserData();
                 string id = RequestContext.Principal.Identity.GetUserId();
                 var user = await data.GetUser(id);
 

@@ -14,20 +14,13 @@ namespace DataManager.Controllers
     [Authorize]
     public class InventoryController : ApiController
     {
-        private readonly IConfiguration _config;
-
-        public InventoryController(IConfiguration config)
-        {
-            _config = config;
-        }
-
         [Authorize(Roles = "Admin,Manager")]
         [HttpGet]
         public async Task<IHttpActionResult> Get()
         {
             try
             {
-                InventoryData data = new InventoryData(_config);
+                InventoryData data = new InventoryData();
 
                 var item = await data.GetAll();
                 return Ok(item);
@@ -44,7 +37,7 @@ namespace DataManager.Controllers
         {
             try
             {
-                InventoryData data = new InventoryData(_config);
+                InventoryData data = new InventoryData();
 
                 await data.Add(item);
                 return Ok();

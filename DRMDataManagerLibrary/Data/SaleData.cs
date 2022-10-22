@@ -13,6 +13,11 @@ namespace DRMDataManagerLibrary.Data
     {
         private readonly IConfiguration _config;
 
+        public SaleData()
+        {
+
+        }
+
         public SaleData(IConfiguration config)
         {
             _config = config;

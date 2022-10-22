@@ -18,6 +18,11 @@ namespace DRMDataManagerLibrary.DataAccess
         private bool _isClosed = false;
         private readonly IConfiguration _config;
 
+        public SqlDataAccess()
+        {
+
+        }
+
         public SqlDataAccess(IConfiguration config)
         {
             _config = config;

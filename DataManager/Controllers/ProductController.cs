@@ -14,18 +14,11 @@ namespace DataManager.Controllers
     [Authorize(Roles = "Cashier")]
     public class ProductController : ApiController
     {
-        private readonly IConfiguration _config;
-
-        public ProductController(IConfiguration config)
-        {
-            _config = config;
-        }
-
         public async Task<IHttpActionResult> Get()
         {
             try
             {
-                ProductData data = new ProductData(_config);
+                ProductData data = new ProductData();
 
                 var products = await data.GetAll();
 
