@@ -17,7 +17,8 @@ public class ProductController : ControllerBase
         _config = config;
     }
 
-    public async Task<IResult> Get()
+    [HttpGet]
+    public async Task<IActionResult> Get()
     {
         try
         {
@@ -27,15 +28,15 @@ public class ProductController : ControllerBase
 
             if (products == null)
             {
-                return Results.NotFound();
+                return NotFound();
             }
 
-            return Results.Ok(products);
+            return Ok(products);
         }
         catch (Exception ex)
         {
 
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 }

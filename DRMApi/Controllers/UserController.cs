@@ -28,7 +28,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IResult> Get()
+    public async Task<IActionResult> Get()
     {
         try
         {
@@ -36,18 +36,18 @@ public class UserController : ControllerBase
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await data.GetUser(id);
 
-            return Results.Ok(user);
+            return Ok(user);
         }
         catch (Exception ex)
         {
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    [Route("api/User/Admin/GetAll")]
-    public async Task<IResult> GetAll()
+    [Route("Admin/GetAll")]
+    public async Task<IActionResult> GetAll()
     {
         try
         {
@@ -71,19 +71,19 @@ public class UserController : ControllerBase
                 people.Add(_user);
             }
 
-            return Results.Ok(people);
+            return Ok(people);
 
         }
         catch (Exception ex)
         {
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    [Route("api/User/Admin/GetAllRoles")]
-    public async Task<IResult> GetAllRoles()
+    [Route("Admin/GetAllRoles")]
+    public async Task<IActionResult> GetAllRoles()
     {
         try
         {
@@ -96,46 +96,46 @@ public class UserController : ControllerBase
                 roles.Add(new ApplicationUserRoleModel { Id = role.Id, Name = role.Name });
             }
 
-            return Results.Ok(roles);
+            return Ok(roles);
 
         }
         catch (Exception ex)
         {
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    [Route("api/User/Admin/AddRole")]
-    public async Task<IResult> AddRole(UserRolePairModel pairing)
+    [Route("Admin/AddRole")]
+    public async Task<IActionResult> AddRole(UserRolePairModel pairing)
     {
         try
         {
             var user = await _userManager.FindByIdAsync(pairing.UserId);
             await _userManager.AddToRoleAsync(user,pairing.RoleName);
-            return Results.Ok();
+            return Ok();
         }
         catch (Exception ex)
         {
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    [Route("api/User/Admin/RemoveRole")]
-    public async Task<IResult> RemoveRole(UserRolePairModel pairing)
+    [Route("Admin/RemoveRole")]
+    public async Task<IActionResult> RemoveRole(UserRolePairModel pairing)
     {
         try
         {
             var user = await _userManager.FindByIdAsync(pairing.UserId);
             await _userManager.RemoveFromRoleAsync(user, pairing.RoleName);
-            return Results.Ok();
+            return Ok();
         }
         catch (Exception ex)
         {
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 }

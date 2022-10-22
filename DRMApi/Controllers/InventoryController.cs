@@ -20,35 +20,35 @@ public class InventoryController : ControllerBase
 
     [Authorize(Roles = "Admin,Manager")]
     [HttpGet]
-    public async Task<IResult> Get()
+    public async Task<IActionResult> Get()
     {
         try
         {
             InventoryData data = new(_config);
 
             var item = await data.GetAll();
-            return Results.Ok(item);
+            return Ok(item);
         }
         catch (Exception ex)
         {
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<IResult> Post(InventoryItemModel item)
+    public async Task<IActionResult> Post(InventoryItemModel item)
     {
         try
         {
             InventoryData data = new(_config);
 
             await data.Add(item);
-            return Results.Ok();
+            return Ok();
         }
         catch (Exception ex)
         {
-            return Results.BadRequest(ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 }
