@@ -1,5 +1,6 @@
 ﻿using DRMDataManagerLibrary.DataAccess;
 using DRMDataManagerLibrary.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,17 @@ namespace DRMDataManagerLibrary.Data
 {
     public class SaleData
     {
+        private readonly IConfiguration _config;
+
+        public SaleData(IConfiguration config)
+        {
+            _config = config;
+        }
+
         // NEEDS REFACTORING
         public async Task Add(SaleModel saleInfo, string cashierId)
         {
-            ProductData products = new ProductData();
+            ProductData products = new ProductData(_config);
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
             decimal taxRate = ConfigHelper.GetTaxRate();
 
@@ -53,7 +61,7 @@ namespace DRMDataManagerLibrary.Data
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            using (SqlDataAccess db = new SqlDataAccess())
+            using (SqlDataAccess db = new SqlDataAccess(_config))
             {
                 try
                 {
@@ -80,7 +88,7 @@ namespace DRMDataManagerLibrary.Data
 
         public async Task<List<SaleReportModel>> GetSaleReport()
         {
-            SqlDataAccess db = new SqlDataAccess();
+            SqlDataAccess db = new SqlDataAccess(_config);
 
             return await db.LoadData<SaleReportModel, dynamic>("[dbo].[spSale_GetSaleReport]", new { }, "DRMData");
         }

@@ -10,11 +10,18 @@ namespace DRMApi.Controllers;
 [ApiController]
 public class ProductController : ControllerBase
 {
+    private readonly IConfiguration _config;
+
+    public ProductController(IConfiguration config)
+    {
+        _config = config;
+    }
+
     public async Task<IResult> Get()
     {
         try
         {
-            ProductData data = new();
+            ProductData data = new(_config);
 
             var products = await data.GetAll();
 

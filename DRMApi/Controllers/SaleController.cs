@@ -12,6 +12,13 @@ namespace DRMApi.Controllers;
 [ApiController]
 public class SaleController : ControllerBase
 {
+    private readonly IConfiguration _config;
+
+    public SaleController(IConfiguration config)
+    {
+        _config = config;
+    }
+
     [Authorize(Roles = "Admin, Manager")]
     [HttpGet]
     [Route("api/Sale/Report")]
@@ -19,7 +26,7 @@ public class SaleController : ControllerBase
     {
         try
         {
-            SaleData data = new();
+            SaleData data = new(_config);
 
             var report = await data.GetSaleReport();
             return Results.Ok(report);
@@ -36,7 +43,7 @@ public class SaleController : ControllerBase
     {
         try
         {
-            SaleData data = new();
+            SaleData data = new(_config);
             string cashierId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             await data.Add(sale, cashierId);
