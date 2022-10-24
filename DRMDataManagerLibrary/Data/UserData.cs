@@ -9,25 +9,18 @@ using System.Threading.Tasks;
 
 namespace DRMDataManagerLibrary.Data
 {
-    public class UserData
+    public class UserData : IUserData
     {
-        private readonly IConfiguration _config;
+        private readonly ISqlDataAccess _db;
 
-        public UserData()
+        public UserData(ISqlDataAccess db)
         {
-
-        }
-
-        public UserData(IConfiguration config)
-        {
-            _config = config;
+            _db = db;
         }
 
         public async Task<UserModel> GetUser(string id)
         {
-            SqlDataAccess db = new SqlDataAccess(_config);
-
-            return (await db.LoadData<UserModel, dynamic>("[dbo].[spUser_Get]", new { Id = id }, "DRMData")).First();
+            return (await _db.LoadData<UserModel, dynamic>("[dbo].[spUser_Get]", new { Id = id }, "DRMData")).First();
         }
     }
 }

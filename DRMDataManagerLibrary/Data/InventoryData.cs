@@ -9,32 +9,23 @@ using System.Threading.Tasks;
 
 namespace DRMDataManagerLibrary.Data
 {
-    public class InventoryData
+    public class InventoryData : IInventoryData
     {
-        private readonly IConfiguration _config;
+        private readonly ISqlDataAccess _db;
 
-        public InventoryData()
+        public InventoryData(ISqlDataAccess db)
         {
-
-        }
-
-        public InventoryData(IConfiguration config)
-        {
-            _config = config;
+            _db = db;
         }
 
         public async Task<List<InventoryItemModel>> GetAll()
         {
-            SqlDataAccess db = new SqlDataAccess(_config);
-
-            return await db.LoadData<InventoryItemModel, dynamic>("[dbo].[spInventory_GetAll]", new { }, "DRMData");
+            return await _db.LoadData<InventoryItemModel, dynamic>("[dbo].[spInventory_GetAll]", new { }, "DRMData");
         }
 
         public async Task Add(InventoryItemModel item)
         {
-            SqlDataAccess db = new SqlDataAccess(_config);
-
-            await db.SaveData("[dbo].[spInventory_Add]", item, "DRMData");
+            await _db.SaveData("[dbo].[spInventory_Add]", item, "DRMData");
         }
     }
 }

@@ -18,13 +18,13 @@ public class UserController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly IConfiguration _config;
+    private readonly IUserData _data;
 
-    public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration config)
+    public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData data)
     {
         _context = context;
         _userManager = userManager;
-        _config = config;
+        _data = data;
     }
 
     [HttpGet]
@@ -32,9 +32,8 @@ public class UserController : ControllerBase
     {
         try
         {
-            UserData data = new(_config);
             string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await data.GetUser(id);
+            var user = await _data.GetUser(id);
 
             return Ok(user);
         }

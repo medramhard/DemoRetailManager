@@ -11,17 +11,12 @@ using System.Threading.Tasks;
 
 namespace DRMDataManagerLibrary.DataAccess
 {
-    public class SqlDataAccess : IDisposable
+    public class SqlDataAccess : IDisposable, ISqlDataAccess
     {
         private IDbConnection _connection;
         private IDbTransaction _transaction;
         private bool _isClosed = false;
         private readonly IConfiguration _config;
-
-        public SqlDataAccess()
-        {
-
-        }
 
         public SqlDataAccess(IConfiguration config)
         {

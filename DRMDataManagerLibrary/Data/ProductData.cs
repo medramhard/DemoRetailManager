@@ -9,32 +9,23 @@ using System.Threading.Tasks;
 
 namespace DRMDataManagerLibrary.Data
 {
-    public class ProductData
+    public class ProductData : IProductData
     {
-        private readonly IConfiguration _config;
+        private readonly ISqlDataAccess _db;
 
-        public ProductData()
+        public ProductData(ISqlDataAccess db)
         {
-
-        }
-
-        public ProductData(IConfiguration config)
-        {
-            _config = config;
+            _db = db;
         }
 
         public async Task<List<ProductModel>> GetAll()
         {
-            SqlDataAccess db = new SqlDataAccess(_config);
-
-            return await db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_GetAll]", new { }, "DRMData");
+            return await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_GetAll]", new { }, "DRMData");
         }
 
         public async Task<ProductModel> Get(int id)
         {
-            SqlDataAccess db = new SqlDataAccess(_config);
-
-            return (await db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_Get]", new { Id = id}, "DRMData")).FirstOrDefault();
+            return (await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_Get]", new { Id = id }, "DRMData")).FirstOrDefault();
         }
     }
 }

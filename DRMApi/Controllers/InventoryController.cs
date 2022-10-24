@@ -11,11 +11,11 @@ namespace DRMApi.Controllers;
 [ApiController]
 public class InventoryController : ControllerBase
 {
-    private readonly IConfiguration _config;
+    private readonly IInventoryData _data;
 
-    public InventoryController(IConfiguration config)
+    public InventoryController(IInventoryData data)
     {
-        _config = config;
+        _data = data;
     }
 
     [Authorize(Roles = "Admin,Manager")]
@@ -24,10 +24,7 @@ public class InventoryController : ControllerBase
     {
         try
         {
-            InventoryData data = new(_config);
-
-            var item = await data.GetAll();
-            return Ok(item);
+            return Ok(await _data.GetAll());
         }
         catch (Exception ex)
         {
@@ -41,9 +38,7 @@ public class InventoryController : ControllerBase
     {
         try
         {
-            InventoryData data = new(_config);
-
-            await data.Add(item);
+            await _data.Add(item);
             return Ok();
         }
         catch (Exception ex)

@@ -9,24 +9,20 @@ using System.Threading.Tasks;
 
 namespace DRMDataManagerLibrary.Data
 {
-    public class SaleData
+    public class SaleData : ISaleData
     {
-        private readonly IConfiguration _config;
+        private readonly IProductData _products;
+        private readonly ISqlDataAccess _db;
 
-        public SaleData()
+        public SaleData(IProductData products, ISqlDataAccess db)
         {
-
-        }
-
-        public SaleData(IConfiguration config)
-        {
-            _config = config;
+            _products = products;
+            _db = db;
         }
 
         // NEEDS REFACTORING
         public async Task Add(SaleModel saleInfo, string cashierId)
         {
-            ProductData products = new ProductData(_config);
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
             decimal taxRate = ConfigHelper.GetTaxRate();
 
@@ -40,7 +36,7 @@ namespace DRMDataManagerLibrary.Data
 
                 try
                 {
-                    var product = await products.Get(item.ProductId);
+                    var product = await _products.Get(item.ProductId);
                     detail.PurchasePrice = product.RetailPrice * detail.Quantity;
 
                     if (product.IsTaxable)
@@ -66,36 +62,32 @@ namespace DRMDataManagerLibrary.Data
 
             sale.Total = sale.SubTotal + sale.Tax;
 
-            using (SqlDataAccess db = new SqlDataAccess(_config))
+
+            try
             {
-                try
+                _db.StartTransaction("DRMData");
+
+                sale.Id = await _db.SaveAndGetIdInTransaction("[dbo].[spSale_Add]",
+                new { sale.CashierId, sale.SaleDate, sale.SubTotal, sale.Tax, sale.Total });
+
+                foreach (var item in details)
                 {
-                    db.StartTransaction("DRMData");
-
-                    sale.Id = await db.SaveAndGetIdInTransaction("[dbo].[spSale_Add]",
-                    new { sale.CashierId, sale.SaleDate, sale.SubTotal, sale.Tax, sale.Total });
-
-                    foreach (var item in details)
-                    {
-                        item.SaleId = sale.Id;
-                        await db.SaveDataInTransaction("[dbo].[spSaleDetail_Add]", item);
-                    }
-
-                    db.CommitTransaction();
+                    item.SaleId = sale.Id;
+                    await _db.SaveDataInTransaction("[dbo].[spSaleDetail_Add]", item);
                 }
-                catch
-                {
-                    db.RollBackTransaction();
-                    throw;
-                }
+
+                _db.CommitTransaction();
+            }
+            catch
+            {
+                _db.RollBackTransaction();
+                throw;
             }
         }
 
         public async Task<List<SaleReportModel>> GetSaleReport()
         {
-            SqlDataAccess db = new SqlDataAccess(_config);
-
-            return await db.LoadData<SaleReportModel, dynamic>("[dbo].[spSale_GetSaleReport]", new { }, "DRMData");
+            return await _db.LoadData<SaleReportModel, dynamic>("[dbo].[spSale_GetSaleReport]", new { }, "DRMData");
         }
     }
 }

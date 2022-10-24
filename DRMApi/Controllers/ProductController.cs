@@ -10,11 +10,11 @@ namespace DRMApi.Controllers;
 [ApiController]
 public class ProductController : ControllerBase
 {
-    private readonly IConfiguration _config;
+    private readonly IProductData _data;
 
-    public ProductController(IConfiguration config)
+    public ProductController(IProductData data)
     {
-        _config = config;
+        _data = data;
     }
 
     [HttpGet]
@@ -22,9 +22,7 @@ public class ProductController : ControllerBase
     {
         try
         {
-            ProductData data = new(_config);
-
-            var products = await data.GetAll();
+            var products = await _data.GetAll();
 
             if (products == null)
             {

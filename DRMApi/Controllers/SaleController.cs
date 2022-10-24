@@ -12,11 +12,11 @@ namespace DRMApi.Controllers;
 [ApiController]
 public class SaleController : ControllerBase
 {
-    private readonly IConfiguration _config;
+    private readonly ISaleData _data;
 
-    public SaleController(IConfiguration config)
+    public SaleController(ISaleData data)
     {
-        _config = config;
+        _data = data;
     }
 
     [Authorize(Roles = "Admin, Manager")]
@@ -26,10 +26,7 @@ public class SaleController : ControllerBase
     {
         try
         {
-            SaleData data = new(_config);
-
-            var report = await data.GetSaleReport();
-            return Ok(report);
+            return Ok(await _data.GetSaleReport());
         }
         catch (Exception ex)
         {
@@ -44,10 +41,9 @@ public class SaleController : ControllerBase
     {
         try
         {
-            SaleData data = new(_config);
             string cashierId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            await data.Add(sale, cashierId);
+            await _data.Add(sale, cashierId);
             return Ok();
         }
         catch (Exception ex)
