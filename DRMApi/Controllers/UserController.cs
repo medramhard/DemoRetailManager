@@ -1,5 +1,4 @@
-﻿using DRMDataManagerLibrary.Data;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
@@ -8,6 +7,8 @@ using DRMApi.Models;
 using DRMApi.Data;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using DRMDataManagerLibrary.Data.Interfaces;
+using DRMDataManagerLibrary.Models;
 
 namespace DRMApi.Controllers;
 
@@ -19,12 +20,20 @@ public class UserController : ControllerBase
     private readonly ApplicationDbContext _context;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IUserData _data;
+    private readonly ILogger<UserController> _logger;
 
-    public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData data)
+    public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData data, ILogger<UserController> logger)
     {
         _context = context;
         _userManager = userManager;
         _data = data;
+        _logger = logger;
+    }
+
+    private async Task<UserModel> GetUser()
+    {
+        string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return await _data.GetUser(id);
     }
 
     [HttpGet]
@@ -32,10 +41,7 @@ public class UserController : ControllerBase
     {
         try
         {
-            string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = await _data.GetUser(id);
-
-            return Ok(user);
+            return Ok(await GetUser());
         }
         catch (Exception ex)
         {
@@ -112,6 +118,11 @@ public class UserController : ControllerBase
         try
         {
             var user = await _userManager.FindByIdAsync(pairing.UserId);
+            var admin = await GetUser();
+
+            _logger.LogInformation("Admin {Admin} added user {User} to role {Role}",
+                admin.Id, user.Id, pairing.RoleName);
+
             await _userManager.AddToRoleAsync(user,pairing.RoleName);
             return Ok();
         }
@@ -129,6 +140,11 @@ public class UserController : ControllerBase
         try
         {
             var user = await _userManager.FindByIdAsync(pairing.UserId);
+            var admin = await GetUser();
+
+            _logger.LogInformation("Admin {Admin} removed user {User} from role {Role}",
+                admin.Id, user.Id, pairing.RoleName);
+
             await _userManager.RemoveFromRoleAsync(user, pairing.RoleName);
             return Ok();
         }

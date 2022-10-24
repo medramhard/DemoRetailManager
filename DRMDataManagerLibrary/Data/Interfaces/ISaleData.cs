@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DRMDataManagerLibrary.Data
+namespace DRMDataManagerLibrary.Data.Interfaces
 {
     public interface ISaleData
     {

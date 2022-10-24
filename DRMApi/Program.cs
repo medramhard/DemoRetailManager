@@ -1,5 +1,6 @@
 using DRMApi.Data;
 using DRMDataManagerLibrary.Data;
+using DRMDataManagerLibrary.Data.Interfaces;
 using DRMDataManagerLibrary.DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;

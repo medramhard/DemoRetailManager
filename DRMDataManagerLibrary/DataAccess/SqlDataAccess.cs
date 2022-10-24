@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -17,10 +18,12 @@ namespace DRMDataManagerLibrary.DataAccess
         private IDbTransaction _transaction;
         private bool _isClosed = false;
         private readonly IConfiguration _config;
+        private readonly ILogger _logger;
 
-        public SqlDataAccess(IConfiguration config)
+        public SqlDataAccess(IConfiguration config, ILogger<SqlDataAccess> logger)
         {
             _config = config;
+            _logger = logger;
         }
 
         private string GetConnectionString(string name)
@@ -98,10 +101,9 @@ namespace DRMDataManagerLibrary.DataAccess
                 {
                     CommitTransaction();
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // TODO: make a proper exception handling, log this issue
-                    throw;
+                    _logger.LogError(ex, "Commit transaction failed in the Dispose method.");
                 }
             }
 

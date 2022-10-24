@@ -1,7 +1,7 @@
 ﻿using DRMDataManagerLibrary.Models;
 using System.Threading.Tasks;
 
-namespace DRMDataManagerLibrary.Data
+namespace DRMDataManagerLibrary.Data.Interfaces
 {
     public interface IUserData
     {

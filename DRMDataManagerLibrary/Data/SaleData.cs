@@ -1,4 +1,5 @@
-﻿using DRMDataManagerLibrary.DataAccess;
+﻿using DRMDataManagerLibrary.Data.Interfaces;
+using DRMDataManagerLibrary.DataAccess;
 using DRMDataManagerLibrary.Models;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -20,7 +21,7 @@ namespace DRMDataManagerLibrary.Data
             _db = db;
         }
 
-        // NEEDS REFACTORING
+        // TODO: ADD METHOD IN SALEDATA NEEDS REFACTORING
         public async Task Add(SaleModel saleInfo, string cashierId)
         {
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
