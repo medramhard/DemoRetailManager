@@ -12,13 +12,11 @@ namespace DRMDesktopUI.ViewModels
 {
     public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
     {
-        private readonly SalesViewModel _salesVM;
         private readonly IEventAggregator _events;
         private readonly ILoggedInUserModel _user;
 
-        public ShellViewModel(SalesViewModel salesVM, IEventAggregator events, ILoggedInUserModel user)
+        public ShellViewModel(IEventAggregator events, ILoggedInUserModel user)
         {
-            _salesVM = salesVM;
             _events = events;
             _user = user;
             _events.SubscribeOnPublishedThread(this);
@@ -61,7 +59,7 @@ namespace DRMDesktopUI.ViewModels
 
         public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
         {
-            await ActivateItemAsync(_salesVM);
+            await ActivateItemAsync(IoC.Get<SalesViewModel>());
             NotifyOfPropertyChange(() => IsLoggedIn);
         }
     }
