@@ -21,7 +21,7 @@ public class SaleController : ControllerBase
 
     [Authorize(Roles = "Admin, Manager")]
     [HttpGet]
-    [Route("Sale/Report")]
+    [Route("Report")]
     public async Task<IActionResult> GetReport()
     {
         try
@@ -37,7 +37,8 @@ public class SaleController : ControllerBase
         }
     }
 
-    [Authorize(Roles = "Cashier")]
+    [AllowAnonymous]
+    //[Authorize(Roles = "Cashier")]
     [HttpPost]
     public async Task<IActionResult> Post(SaleModel sale)
     {
