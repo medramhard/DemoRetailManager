@@ -2,6 +2,7 @@
 using DRMDataManagerLibrary.Data;
 using DRMDataManagerLibrary.Models;
 using Microsoft.AspNet.Identity;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;

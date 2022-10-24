@@ -20,7 +20,7 @@ namespace DRMDesktopUILibrary.Api
 
         public async Task<List<ProductModel>> GetAll()
         {
-            using (var response = await _apiHelper.ApiClient.GetAsync("/api/Product"))
+            using (var response = await _apiHelper.ApiClient.GetAsync("api/Product"))
             {
                 if (response.IsSuccessStatusCode)
                 {

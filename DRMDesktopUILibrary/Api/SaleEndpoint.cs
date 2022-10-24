@@ -19,7 +19,7 @@ namespace DRMDesktopUILibrary.Api
 
         public async Task Post(SaleModel sale)
         {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("/api/Sale", sale))
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("api/Sale", sale))
             {
                 if (response.IsSuccessStatusCode)
                 {
