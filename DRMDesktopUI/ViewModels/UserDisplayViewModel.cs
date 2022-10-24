@@ -57,7 +57,7 @@ namespace DRMDesktopUI.ViewModels
                     _status.UpdateMessage("Fatal Exception", ex.Message);
                 }
 
-                _window.ShowDialogAsync(_status, null, settings);
+                await _window.ShowDialogAsync(_status, null, settings);
                 await TryCloseAsync();
             }
         }

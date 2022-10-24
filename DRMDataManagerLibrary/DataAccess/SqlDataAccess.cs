@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -15,10 +16,26 @@ namespace DRMDataManagerLibrary.DataAccess
         private IDbConnection _connection;
         private IDbTransaction _transaction;
         private bool _isClosed = false;
+        private readonly IConfiguration _config;
+
+        public SqlDataAccess()
+        {
+
+        }
+
+        public SqlDataAccess(IConfiguration config)
+        {
+            _config = config;
+        }
+
+        private string GetConnectionString(string name)
+        {
+            return _config.GetConnectionString(name);
+        }
 
         public async Task<List<T>> LoadData<T, U>(string storedProcedure, U parameters, string cnnName)
         {
-            using (IDbConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString))
+            using (IDbConnection connection = new SqlConnection(GetConnectionString(cnnName)))
             {
                 return (await connection.QueryAsync<T>(storedProcedure, parameters, commandType: CommandType.StoredProcedure)).ToList();
             }
@@ -31,7 +48,7 @@ namespace DRMDataManagerLibrary.DataAccess
 
         public async Task SaveData<T>(string storedProcedure, T parameters, string cnnName)
         {
-            using (IDbConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString))
+            using (IDbConnection connection = new SqlConnection(GetConnectionString(cnnName)))
             {
                 await connection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
             }
@@ -44,7 +61,7 @@ namespace DRMDataManagerLibrary.DataAccess
 
         public async Task<int> SaveAndGetId<T>(string storedProcedure, T parameters, string cnnName)
         {
-            using (IDbConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString))
+            using (IDbConnection connection = new SqlConnection(GetConnectionString(cnnName)))
             {
                 return await connection.QuerySingleAsync<int>(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
             }
@@ -58,7 +75,7 @@ namespace DRMDataManagerLibrary.DataAccess
 
         public void StartTransaction(string cnnName)
         {
-            _connection = new SqlConnection(ConfigurationManager.ConnectionStrings[cnnName].ConnectionString);
+            _connection = new SqlConnection(GetConnectionString(cnnName));
             _connection.Open();
             _transaction = _connection.BeginTransaction();
             _isClosed = false;
