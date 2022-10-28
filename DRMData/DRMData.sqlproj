@@ -61,22 +61,17 @@
     <Folder Include="dbo\Views" />
     <Folder Include="dbo\Stored Procedures" />
     <Folder Include="PublishLocations" />
-    <Folder Include="dbo\Stored Procedures\User" />
     <Folder Include="dbo\Stored Procedures\Product" />
     <Folder Include="dbo\Stored Procedures\Sale" />
     <Folder Include="dbo\Stored Procedures\SaleDetail" />
     <Folder Include="dbo\Stored Procedures\Inventory" />
+    <Folder Include="dbo\Scripts" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="PublishLocations\DRMData.publish.xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Build Include="dbo\Tables\User.sql" />
     <Build Include="dbo\Tables\Sale.sql" />
     <Build Include="dbo\Tables\SaleDetail.sql" />
     <Build Include="dbo\Tables\Product.sql" />
     <Build Include="dbo\Tables\Inventory.sql" />
-    <Build Include="dbo\Stored Procedures\User\spUser_Get.sql" />
     <Build Include="dbo\Stored Procedures\Product\spProduct_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\Sale\spSale_Add.sql" />
     <Build Include="dbo\Stored Procedures\Product\spProduct_Get.sql" />
@@ -87,5 +82,11 @@
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DRMData.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="dbo\Scripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="PublishLocations\DRMData.publish.xml" />
   </ItemGroup>
 </Project>

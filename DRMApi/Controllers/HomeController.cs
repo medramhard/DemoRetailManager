@@ -8,14 +8,66 @@ namespace DRMApi.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, RoleManager<IdentityRole> roleManager, UserManager<IdentityUser> userManager)
         {
             _logger = logger;
+            _roleManager = roleManager;
+            _userManager = userManager;
         }
 
-        public IActionResult Index()
+        private async Task<string[]> CreateRoles()
         {
+            string[] roles = { "Admin", "Manager", "Cashier" };
+
+            foreach (var role in roles)
+            {
+                var roleExist = await _roleManager.RoleExistsAsync(role);
+
+                if (roleExist == false)
+                {
+                    await _roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
+
+            return roles;
+        }
+
+        // The method below populates EF Database with Admin, and Manager users
+        public async Task<IActionResult> Index()
+        {
+            var roles = await CreateRoles();
+
+            var admin = new EFUserModel()
+            {
+                Id = new Guid("59182404-dfce-41a4-8164-8004d4cd2a65"),
+                UserName = "Admin",
+                Email = "admin@drm.com",
+                EmailConfirmed = true
+            };
+            var user = admin.GetUser();
+            var result = await _userManager.CreateAsync(user, "!A3fpnzUaeLs8");
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRolesAsync(user, roles);
+            }
+
+            var manager = new EFUserModel()
+            {
+                Id = new Guid("5b0b8746-1b2a-4aa7-88e2-daed351f4ab0"),
+                UserName = "Manager",
+                Email = "manager@drm.com",
+                EmailConfirmed = true
+            };
+            user = manager.GetUser();
+            result = await _userManager.CreateAsync(user, "1apMn(XMkjvy)");
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(user, "Manager");
+            }
+
             return View();
         }
 

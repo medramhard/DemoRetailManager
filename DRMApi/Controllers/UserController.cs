@@ -19,21 +19,33 @@ public class UserController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
     private readonly UserManager<IdentityUser> _userManager;
-    private readonly IUserData _data;
     private readonly ILogger<UserController> _logger;
 
-    public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData data, ILogger<UserController> logger)
+    public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, ILogger<UserController> logger)
     {
         _context = context;
         _userManager = userManager;
-        _data = data;
         _logger = logger;
     }
 
-    private async Task<UserModel> GetUser()
+    private async Task<ApplicationUserModel> GetUser()
     {
         string id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        return await _data.GetUser(id);
+        var user = await (from u in _context.Users
+                            where u.Id == id
+                            select new { u.Id, u.Email, u.UserName }).FirstOrDefaultAsync();
+        if (user != null)
+        {
+            ApplicationUserModel output = new ()
+            {
+                Id = user.Id,
+                EmailAddress = user.Email
+            };
+
+            return output;
+        }
+
+        return null;
     }
 
     [HttpGet]
@@ -41,7 +53,14 @@ public class UserController : ControllerBase
     {
         try
         {
-            return Ok(await GetUser());
+            var user = await GetUser();
+
+            if (user != null)
+            {
+                return Ok(user); 
+            }
+
+            return NotFound();
         }
         catch (Exception ex)
         {

@@ -1,7 +1,6 @@
 ﻿using DRMDataManagerLibrary.Data.Interfaces;
 using DRMDataManagerLibrary.DataAccess;
 using DRMDataManagerLibrary.Models;
-using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +22,7 @@ namespace DRMDataManagerLibrary.Data
         }
 
         // TODO: ADD METHOD IN SALEDATA NEEDS REFACTORING
+        // TODO: SALE MUST IMPACT INVENTORY TABLE AS WELL
         public async Task Add(SaleModel saleInfo, string cashierId)
         {
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();

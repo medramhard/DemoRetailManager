@@ -28,7 +28,6 @@ builder.Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
 builder.Services.AddTransient<IInventoryData, InventoryData>();
 builder.Services.AddTransient<IProductData, ProductData>();
 builder.Services.AddTransient<ISaleData, SaleData>();
-builder.Services.AddTransient<IUserData, UserData>();
 
 builder.Services.AddAuthentication(options =>
 {

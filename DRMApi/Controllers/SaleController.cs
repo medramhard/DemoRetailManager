@@ -34,8 +34,7 @@ public class SaleController : ControllerBase
         }
     }
 
-    [AllowAnonymous]
-    //[Authorize(Roles = "Cashier")]
+    [Authorize(Roles = "Cashier")]
     [HttpPost]
     public async Task<IActionResult> Post(SaleModel sale)
     {
