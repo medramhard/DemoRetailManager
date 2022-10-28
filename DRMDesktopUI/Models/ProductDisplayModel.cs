@@ -5,35 +5,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUI.Models
+namespace DRMDesktopUI.Models;
+
+public class ProductDisplayModel : INotifyPropertyChanged
 {
-    public class ProductDisplayModel : INotifyPropertyChanged
+    private int _quantityInStock;
+
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public decimal RetailPrice { get; set; }
+    public int QuantityInStock
     {
-        private int _quantityInStock;
-
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public decimal RetailPrice { get; set; }
-        public int QuantityInStock
+        get
         {
-            get
-            {
-                return _quantityInStock;
-            }
-            set
-            {
-                _quantityInStock = value;
-                CallPropertyChanged(nameof(QuantityInStock));
-            }
+            return _quantityInStock;
         }
-        public bool IsTaxable { get; set; }
-
-        private void CallPropertyChanged(string property)
+        set
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            _quantityInStock = value;
+            CallPropertyChanged(nameof(QuantityInStock));
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
+    public bool IsTaxable { get; set; }
+
+    private void CallPropertyChanged(string property)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
 }

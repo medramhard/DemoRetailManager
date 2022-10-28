@@ -2,7 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUILibrary.Api
+namespace DRMDesktopUILibrary.Api.Interfaces
 {
     public interface IApiHelper
     {

@@ -5,25 +5,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUI.ViewModels
+namespace DRMDesktopUI.ViewModels;
+
+public class StatusInfoViewModel : Screen
 {
-    public class StatusInfoViewModel : Screen
+    public string Header { get; set; }
+    public string Message { get; set; }
+
+    public void UpdateMessage(string header, string message)
     {
-        public string Header { get; set; }
-        public string Message { get; set; }
+        Header = header;
+        Message = message;
 
-        public void UpdateMessage(string header, string message)
-        {
-            Header = header;
-            Message = message;
+        NotifyOfPropertyChange(() => Header);
+        NotifyOfPropertyChange(() => Message);
+    }
 
-            NotifyOfPropertyChange(() => Header);
-            NotifyOfPropertyChange(() => Message);
-        }
-
-        public void Close()
-        {
-            TryCloseAsync();
-        }
+    public void Close()
+    {
+        TryCloseAsync();
     }
 }

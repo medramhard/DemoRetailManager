@@ -14,6 +14,7 @@ namespace DRMDataManagerLibrary.Data
     {
         private readonly IProductData _products;
         private readonly ISqlDataAccess _db;
+        private const decimal _taxRate = 8.75m;
 
         public SaleData(IProductData products, ISqlDataAccess db)
         {
@@ -25,7 +26,6 @@ namespace DRMDataManagerLibrary.Data
         public async Task Add(SaleModel saleInfo, string cashierId)
         {
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
-            decimal taxRate = ConfigHelper.GetTaxRate();
 
             foreach (var item in saleInfo.SaleDetails)
             {
@@ -42,7 +42,7 @@ namespace DRMDataManagerLibrary.Data
 
                     if (product.IsTaxable)
                     {
-                        detail.Tax = detail.PurchasePrice * taxRate / 100;
+                        detail.Tax = detail.PurchasePrice * _taxRate / 100;
                     }
 
                     details.Add(detail);

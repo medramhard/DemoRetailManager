@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using System.Configuration;
 using DRMDesktopUILibrary.Models;
+using DRMDesktopUILibrary.Api.Interfaces;
 
 namespace DRMDesktopUILibrary.Api
 {

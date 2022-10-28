@@ -5,31 +5,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUI.Models
+namespace DRMDesktopUI.Models;
+
+public class CartItemDisplayModel : INotifyPropertyChanged
 {
-    public class CartItemDisplayModel : INotifyPropertyChanged
+    private int _quantityInCart;
+
+    public ProductDisplayModel Product { get; set; }
+    public int QuantityInCart
     {
-        private int _quantityInCart;
-
-        public ProductDisplayModel Product { get; set; }
-        public int QuantityInCart
+        get
         {
-            get
-            {
-                return _quantityInCart;
-            }
-            set
-            {
-                _quantityInCart = value;
-                CallPropertyChanged(nameof(QuantityInCart));
-            }
+            return _quantityInCart;
         }
-
-        private void CallPropertyChanged(string property)
+        set
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+            _quantityInCart = value;
+            CallPropertyChanged(nameof(QuantityInCart));
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
+
+    private void CallPropertyChanged(string property)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
 }

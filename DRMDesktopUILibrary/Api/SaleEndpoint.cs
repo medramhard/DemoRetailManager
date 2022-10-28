@@ -1,9 +1,7 @@
-﻿using DRMDesktopUILibrary.Models;
+﻿using DRMDesktopUILibrary.Api.Interfaces;
+using DRMDesktopUILibrary.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace DRMDesktopUILibrary.Api
@@ -21,11 +19,7 @@ namespace DRMDesktopUILibrary.Api
         {
             using (HttpResponseMessage response = await _apiHelper.ApiClient.PostAsJsonAsync("api/Sale", sale))
             {
-                if (response.IsSuccessStatusCode)
-                {
-
-                }
-                else
+                if (response.IsSuccessStatusCode == false)
                 {
                     throw new Exception(response.ReasonPhrase);
                 }

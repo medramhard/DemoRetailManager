@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUI.EventModels
-{
-    public class LogOnEvent
-    {
+namespace DRMDesktopUI.EventModels;
 
-    }
+public class LogOnEvent
+{
+
 }

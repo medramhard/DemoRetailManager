@@ -8,59 +8,58 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUI.ViewModels
+namespace DRMDesktopUI.ViewModels;
+
+public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
 {
-    public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
+    private readonly IEventAggregator _events;
+    private readonly ILoggedInUserModel _user;
+
+    public ShellViewModel(IEventAggregator events, ILoggedInUserModel user)
     {
-        private readonly IEventAggregator _events;
-        private readonly ILoggedInUserModel _user;
+        _events = events;
+        _user = user;
+        _events.SubscribeOnPublishedThread(this);
 
-        public ShellViewModel(IEventAggregator events, ILoggedInUserModel user)
+        ActivateItemAsync(IoC.Get<LoginViewModel>());
+    }
+
+    public bool IsLoggedIn
+    {
+        get
         {
-            _events = events;
-            _user = user;
-            _events.SubscribeOnPublishedThread(this);
+            bool output = false;
 
-            ActivateItemAsync(IoC.Get<LoginViewModel>());
-        }
-
-        public bool IsLoggedIn
-        {
-            get
+            if (string.IsNullOrWhiteSpace(_user.Token) == false)
             {
-                bool output = false;
-
-                if (string.IsNullOrWhiteSpace(_user.Token) == false)
-                {
-                    output = true;
-                }
-
-                return output;
+                output = true;
             }
-        }
 
-        public void UserManagement()
-        {
-            ActivateItemAsync(IoC.Get<UserDisplayViewModel>());
-
+            return output;
         }
+    }
 
-        public void LogOut()
-        {
-            _user.LogOut();
-            ActivateItemAsync(IoC.Get<LoginViewModel>());
-            NotifyOfPropertyChange(() => IsLoggedIn);
-        }
+    public void UserManagement()
+    {
+        ActivateItemAsync(IoC.Get<UserDisplayViewModel>());
 
-        public async Task ExitApplication()
-        {
-            await TryCloseAsync();
-        }
+    }
 
-        public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
-        {
-            await ActivateItemAsync(IoC.Get<SalesViewModel>());
-            NotifyOfPropertyChange(() => IsLoggedIn);
-        }
+    public void LogOut()
+    {
+        _user.LogOut();
+        ActivateItemAsync(IoC.Get<LoginViewModel>());
+        NotifyOfPropertyChange(() => IsLoggedIn);
+    }
+
+    public async Task ExitApplication()
+    {
+        await TryCloseAsync();
+    }
+
+    public async Task HandleAsync(LogOnEvent message, CancellationToken cancellationToken)
+    {
+        await ActivateItemAsync(IoC.Get<SalesViewModel>());
+        NotifyOfPropertyChange(() => IsLoggedIn);
     }
 }

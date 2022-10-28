@@ -1,7 +1,7 @@
 ﻿using DRMDesktopUILibrary.Models;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUILibrary.Api
+namespace DRMDesktopUILibrary.Api.Interfaces
 {
     public interface ISaleEndpoint
     {

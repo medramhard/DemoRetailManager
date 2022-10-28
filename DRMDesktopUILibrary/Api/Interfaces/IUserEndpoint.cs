@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace DRMDesktopUILibrary.Api
+namespace DRMDesktopUILibrary.Api.Interfaces
 {
     public interface IUserEndpoint
     {

@@ -4,7 +4,7 @@ using DRMDesktopUI.Helper;
 using DRMDesktopUI.Models;
 using DRMDesktopUI.ViewModels;
 using DRMDesktopUILibrary.Api;
-using DRMDesktopUILibrary.Helpers;
+using DRMDesktopUILibrary.Api.Interfaces;
 using DRMDesktopUILibrary.Models;
 using System;
 using System.Collections.Generic;
@@ -14,75 +14,73 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace DRMDesktopUI
+namespace DRMDesktopUI;
+
+public class Bootstrapper : BootstrapperBase
 {
-    public class Bootstrapper : BootstrapperBase
+    private SimpleContainer _container = new SimpleContainer();
+
+    public Bootstrapper()
     {
-        private SimpleContainer _container = new SimpleContainer();
+        Initialize();
 
-        public Bootstrapper()
+        ConventionManager.AddElementConvention<PasswordBox>(
+        PasswordBoxHelper.BoundPasswordProperty,
+        "Password",
+        "PasswordChanged");
+    }
+
+    private IMapper ConfigureAutomapper()
+    {
+        var config = new MapperConfiguration(cfg =>
         {
-            Initialize();
+            cfg.CreateMap<ProductModel, ProductDisplayModel>();
+            cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
+        });
 
-            ConventionManager.AddElementConvention<PasswordBox>(
-            PasswordBoxHelper.BoundPasswordProperty,
-            "Password",
-            "PasswordChanged");
-        }
+        return config.CreateMapper();
+    }
 
-        private IMapper ConfigureAutomapper()
-        {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<ProductModel, ProductDisplayModel>();
-                cfg.CreateMap<CartItemModel, CartItemDisplayModel>();
-            });
+    protected override void Configure()
+    {
+        _container.Instance(ConfigureAutomapper());
 
-            return config.CreateMapper();
-        }
+        _container.Instance(_container)
+            .PerRequest<ISaleEndpoint, SaleEndpoint>()
+            .PerRequest<IUserEndpoint, UserEndpoint>()
+            .PerRequest<IProductEndpoint, ProductEndpoint>();
 
-        protected override void Configure()
-        {
-            _container.Instance(ConfigureAutomapper());
+        _container
+            .Singleton<IWindowManager, WindowManager>()
+            .Singleton<IEventAggregator, EventAggregator>()
+            .Singleton<IApiHelper, ApiHelper>()
+            .Singleton<ILoggedInUserModel, LoggedInUserModel>();
 
-            _container.Instance(_container)
-                .PerRequest<ISaleEndpoint, SaleEndpoint>()
-                .PerRequest<IUserEndpoint, UserEndpoint>()
-                .PerRequest<IProductEndpoint, ProductEndpoint>();
+        GetType().Assembly.GetTypes()
+            .Where(type => type.IsClass)
+            .Where(type => type.Name.EndsWith("ViewModel"))
+            .ToList()
+            .ForEach(viewModelType => _container.RegisterPerRequest(
+                viewModelType, viewModelType.ToString(), viewModelType));
+    }
 
-            _container
-                .Singleton<IWindowManager, WindowManager>()
-                .Singleton<IEventAggregator, EventAggregator>()
-                .Singleton<IApiHelper, ApiHelper>()
-                .Singleton<IConfigHelper, ConfigHelper>()
-                .Singleton<ILoggedInUserModel, LoggedInUserModel>();
+    protected override void OnStartup(object sender, StartupEventArgs e)
+    {
+        DisplayRootViewForAsync<ShellViewModel>();
+    }
 
-            GetType().Assembly.GetTypes()
-                .Where(type => type.IsClass)
-                .Where(type => type.Name.EndsWith("ViewModel"))
-                .ToList()
-                .ForEach(viewModelType => _container.RegisterPerRequest(
-                    viewModelType, viewModelType.ToString(), viewModelType));
-        }
+    protected override object GetInstance(Type service, string key)
+    {
+        return _container.GetInstance(service, key);
+    }
 
-        protected override void OnStartup(object sender, StartupEventArgs e)
-        {
-            DisplayRootViewForAsync<ShellViewModel>();
-        }
+    protected override IEnumerable<object> GetAllInstances(Type service)
+    {
+        return _container.GetAllInstances(service);
+    }
 
-        protected override object GetInstance(Type service, string key)
-        {
-            return _container.GetInstance(service, key);
-        }
-
-        protected override IEnumerable<object> GetAllInstances(Type service)
-        {
-            return _container.GetAllInstances(service);
-        }
-
-        protected override void BuildUp(object instance)
-        {
-            _container.BuildUp(instance);
-        }
+    protected override void BuildUp(object instance)
+    {
+        _container.BuildUp(instance);
     }
 }
