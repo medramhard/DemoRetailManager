@@ -1,4 +1,5 @@
 ﻿using DRMDataManagerLibrary.Data.Interfaces;
+using DRMDataManagerLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,20 @@ public class ProductController : ControllerBase
         catch (Exception ex)
         {
 
+            return BadRequest(ex.Message);
+        }
+    }
+
+    [HttpPut]
+    public async Task<IActionResult> UpdateQuantity(ProductModel product)
+    {
+        try
+        {
+            await _data.Update(product);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
             return BadRequest(ex.Message);
         }
     }

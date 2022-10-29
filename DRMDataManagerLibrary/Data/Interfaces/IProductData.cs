@@ -8,5 +8,6 @@ namespace DRMDataManagerLibrary.Data.Interfaces
     {
         Task<ProductModel> Get(int id);
         Task<List<ProductModel>> GetAll();
+        Task Update(ProductModel product);
     }
 }

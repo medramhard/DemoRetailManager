@@ -21,13 +21,11 @@ namespace DRMDataManagerLibrary.Data
             _db = db;
         }
 
-        // TODO: ADD METHOD IN SALEDATA NEEDS REFACTORING
-        // TODO: SALE MUST IMPACT INVENTORY TABLE AS WELL
-        public async Task Add(SaleModel saleInfo, string cashierId)
+        private async Task<List<SaleDetailDBModel>> GetDetails(SaleModel sale)
         {
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();
 
-            foreach (var item in saleInfo.SaleDetails)
+            foreach (var item in sale.SaleDetails)
             {
                 var detail = new SaleDetailDBModel()
                 {
@@ -35,35 +33,27 @@ namespace DRMDataManagerLibrary.Data
                     Quantity = item.Quantity
                 };
 
-                try
+                var product = await _products.Get(item.ProductId);
+
+                // Update Quantity of product in stock
+                product.QuantityInStock -= item.Quantity;
+                await _products.Update(product);
+
+                detail.PurchasePrice = product.RetailPrice * detail.Quantity;
+
+                if (product.IsTaxable)
                 {
-                    var product = await _products.Get(item.ProductId);
-                    detail.PurchasePrice = product.RetailPrice * detail.Quantity;
-
-                    if (product.IsTaxable)
-                    {
-                        detail.Tax = detail.PurchasePrice * _taxRate / 100;
-                    }
-
-                    details.Add(detail);
+                    detail.Tax = detail.PurchasePrice * _taxRate / 100;
                 }
-                catch (Exception)
-                {
 
-                    throw new Exception($"The product Id of {item.ProductId} could not be found in the database.");
-                }
+                details.Add(detail);
             }
 
-            SaleDBModel sale = new SaleDBModel()
-            {
-                SubTotal = details.Sum(x => x.PurchasePrice),
-                Tax = details.Sum(x => x.Tax),
-                CashierId = cashierId
-            };
+            return details;
+        }
 
-            sale.Total = sale.SubTotal + sale.Tax;
-
-
+        private async Task PostSale(SaleDBModel sale, List<SaleDetailDBModel> details)
+        {
             try
             {
                 _db.StartTransaction("DRMData");
@@ -84,6 +74,22 @@ namespace DRMDataManagerLibrary.Data
                 _db.RollBackTransaction();
                 throw;
             }
+        }
+
+        public async Task Add(SaleModel saleInfo, string cashierId)
+        {
+            var details = await GetDetails(saleInfo);
+
+            SaleDBModel sale = new SaleDBModel()
+            {
+                SubTotal = details.Sum(x => x.PurchasePrice),
+                Tax = details.Sum(x => x.Tax),
+                CashierId = cashierId
+            };
+
+            sale.Total = sale.SubTotal + sale.Tax;
+
+            await PostSale(sale, details);
         }
 
         public async Task<List<SaleReportModel>> GetSaleReport()

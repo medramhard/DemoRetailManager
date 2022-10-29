@@ -13,6 +13,7 @@ namespace DRMDataManagerLibrary.Data
     public class ProductData : IProductData
     {
         private readonly ISqlDataAccess _db;
+        private const string _dbName = "DRMData";
 
         public ProductData(ISqlDataAccess db)
         {
@@ -21,12 +22,17 @@ namespace DRMDataManagerLibrary.Data
 
         public async Task<List<ProductModel>> GetAll()
         {
-            return await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_GetAll]", new { }, "DRMData");
+            return await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_GetAll]", new { }, _dbName);
         }
 
         public async Task<ProductModel> Get(int id)
         {
-            return (await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_Get]", new { Id = id }, "DRMData")).FirstOrDefault();
+            return (await _db.LoadData<ProductModel, dynamic>("[dbo].[spProduct_Get]", new { Id = id }, _dbName)).FirstOrDefault();
+        }
+
+        public async Task Update(ProductModel product)
+        {
+            await _db.SaveData("[dbo].[spProduct_UpdateQuantity]", product, _dbName);
         }
     }
 }

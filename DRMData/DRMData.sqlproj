@@ -79,6 +79,7 @@
     <Build Include="dbo\Stored Procedures\Inventory\spInventory_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\Inventory\spInventory_Add.sql" />
     <Build Include="dbo\Stored Procedures\Sale\spSale_GetSaleReport.sql" />
+    <Build Include="dbo\Stored Procedures\Product\spProduct_UpdateQuantity.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="DRMData.refactorlog" />
