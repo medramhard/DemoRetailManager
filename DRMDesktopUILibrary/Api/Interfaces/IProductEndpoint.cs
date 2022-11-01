@@ -7,5 +7,6 @@ namespace DRMDesktopUILibrary.Api.Interfaces
     public interface IProductEndpoint
     {
         Task<List<ProductModel>> GetAll();
+        Task UpdateQuantity(ProductModel product);
     }
 }

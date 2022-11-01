@@ -45,6 +45,11 @@ public class ShellViewModel : Conductor<object>, IHandle<LogOnEvent>
 
     }
 
+    public void Inventory()
+    {
+        ActivateItemAsync(IoC.Get<InventoryViewModel>());
+    }
+
     public void LogOut()
     {
         _user.LogOut();

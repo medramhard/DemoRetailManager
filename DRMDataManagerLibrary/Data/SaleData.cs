@@ -21,6 +21,8 @@ namespace DRMDataManagerLibrary.Data
             _db = db;
         }
 
+        // TODO: ADD RESTOCKING OF THE QUANTITY IN STOCK ON BUTTON CLICK
+
         private async Task<List<SaleDetailDBModel>> GetDetails(SaleModel sale)
         {
             List<SaleDetailDBModel> details = new List<SaleDetailDBModel>();

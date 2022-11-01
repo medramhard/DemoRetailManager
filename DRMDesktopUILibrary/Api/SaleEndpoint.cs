@@ -24,7 +24,6 @@ namespace DRMDesktopUILibrary.Api
                     throw new Exception(response.ReasonPhrase);
                 }
             }
-
         }
     }
 }

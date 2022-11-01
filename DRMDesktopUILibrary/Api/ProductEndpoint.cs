@@ -33,5 +33,16 @@ namespace DRMDesktopUILibrary.Api
                 }
             }
         }
+
+        public async Task UpdateQuantity(ProductModel product)
+        {
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.PutAsJsonAsync("api/Product", product))
+            {
+                if (response.IsSuccessStatusCode == false)
+                {
+                    throw new Exception(response.ReasonPhrase);
+                }
+            }
+        }
     }
 }

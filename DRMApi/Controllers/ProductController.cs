@@ -40,6 +40,7 @@ public class ProductController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Cashier,Admin,Manager")]
     public async Task<IActionResult> UpdateQuantity(ProductModel product)
     {
         try

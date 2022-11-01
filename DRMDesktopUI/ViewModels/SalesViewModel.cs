@@ -70,6 +70,7 @@ public class SalesViewModel : Screen
         var results = new BindingList<ProductModel>(await _productEndpoint.GetAll());
         Products = new BindingList<ProductDisplayModel>(_mapper.Map<List<ProductDisplayModel>>(results));
     }
+
     private async Task ResetSaleViewmodel()
     {
         Cart = new BindingList<CartItemDisplayModel>();
@@ -195,7 +196,7 @@ public class SalesViewModel : Screen
         {
             bool output = false;
 
-            if (SelectedProduct?.QuantityInStock > 0)
+            if (SelectedProduct?.QuantityInStock > 0 && ProductQuantity > 0)
             {
                 output = true;
             }
@@ -210,7 +211,7 @@ public class SalesViewModel : Screen
         {
             bool output = false;
 
-            if (SelectedInCart?.QuantityInCart > 0)
+            if (SelectedInCart?.QuantityInCart > 0 && ProductQuantity > 0)
             {
                 output = true;
             }
@@ -283,7 +284,7 @@ public class SalesViewModel : Screen
 
     public async Task Buy()
     {
-        SaleModel sale = new SaleModel();
+        SaleModel sale = new();
 
         foreach (var item in Cart)
         {
