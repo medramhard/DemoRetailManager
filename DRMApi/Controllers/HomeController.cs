@@ -42,7 +42,6 @@ namespace DRMApi.Controllers
 
             var admin = new EFUserModel()
             {
-                Id = new Guid("59182404-dfce-41a4-8164-8004d4cd2a65"),
                 UserName = "Admin",
                 Email = "admin@drm.com",
                 EmailConfirmed = true
@@ -56,7 +55,6 @@ namespace DRMApi.Controllers
 
             var manager = new EFUserModel()
             {
-                Id = new Guid("5b0b8746-1b2a-4aa7-88e2-daed351f4ab0"),
                 UserName = "Manager",
                 Email = "manager@drm.com",
                 EmailConfirmed = true
